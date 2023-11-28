@@ -2,7 +2,6 @@ package api
 
 import (
 	backendapi "chatgpt-mirror-server/backend-api"
-	"chatgpt-mirror-server/config"
 	"chatgpt-mirror-server/modules/chatgpt/model"
 	"net/http"
 	"time"
@@ -27,16 +26,17 @@ func Session(r *ghttp.Request) {
 		r.Response.WriteStatus(http.StatusUnauthorized)
 		return
 	}
-	officialSession := gjson.New(record["officialSession"].String())
-	getSessionUrl := config.CHATPROXY(ctx) + "/getsession"
-	refreshCookie := officialSession.Get("refreshCookie").String()
-	sessionVar := g.Client().SetHeader("authkey", config.AUTHKEY(ctx)).PostVar(ctx, getSessionUrl, g.Map{
-		"username":      record["email"].String(),
-		"password":      record["password"].String(),
-		"authkey":       config.AUTHKEY(ctx),
-		"refreshCookie": refreshCookie,
-	})
-	sessionJson := gjson.New(sessionVar)
+	// officialSession := gjson.New(record["officialSession"].String())
+
+	// getSessionUrl := config.CHATPROXY(ctx) + "/getsession"
+	// refreshCookie := officialSession.Get("refreshCookie").String()
+	// sessionVar := g.Client().SetHeader("authkey", config.AUTHKEY(ctx)).PostVar(ctx, getSessionUrl, g.Map{
+	// 	"username":      record["email"].String(),
+	// 	"password":      record["password"].String(),
+	// 	"authkey":       config.AUTHKEY(ctx),
+	// 	"refreshCookie": refreshCookie,
+	// })
+	sessionJson := gjson.New(record["officialSession"].String())
 	if sessionJson.Get("accessToken").String() == "" {
 		g.Log().Error(ctx, "get session error", sessionJson)
 		r.Response.WriteStatus(http.StatusUnauthorized)
