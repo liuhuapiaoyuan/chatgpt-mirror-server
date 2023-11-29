@@ -18,7 +18,7 @@ type ChatgptUser struct {
 	IsPlus     bool       `gorm:"column:isPlus;comment:PLUS;default:0" json:"isPlus"`
 	IsIsolate  bool       `gorm:"column:isIsolate;comment:会话隔离;default:0" json:"isIsolate"`
 	Remark     string     `gorm:"column:remark;comment:备注" json:"remark"`
-	SessionId  int        `gorm:"column:remark;comment:绑定账号" json:"sessionId"`
+	SessionId  int        `gorm:"column:sessionId;comment:绑定账号" json:"sessionId"`
 }
 
 // TableName ChatgptUser's table name
