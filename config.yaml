@@ -60,5 +60,6 @@ CHATPROXY: "https://demo.xyhelper.cn"
 # 接入网关的authkey
 AUTHKEY: "xyhelper"
 ONLYTOKEN: false
+CDNHOST: "https://cdn.chatgpt.ggss.club/file"
 
 # 5a07e29c-31d8-4976-ba66-f183598587d9

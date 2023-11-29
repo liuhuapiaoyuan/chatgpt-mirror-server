@@ -61,6 +61,11 @@ func ONLYTOKEN(ctx g.Ctx) bool {
 	return g.Cfg().MustGetWithEnv(ctx, "ONLYTOKEN").Bool()
 }
 
+// 获取cdnhost
+func CDNHOST(ctx g.Ctx) string {
+	return g.Cfg().MustGetWithEnv(ctx, "CDNHOST").String()
+}
+
 func CRONINTERVAL(ctx g.Ctx) string {
 	// 生成随机时间的每3天执行一次的表达式，格式为：秒 分 时 天 月 星期
 	// 生成随机秒数 在0-59之间
