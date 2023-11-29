@@ -39,7 +39,7 @@ const Upsert = useUpsert({
 	items: [
 		{ label: "邮箱", prop: "email", required: true, component: { name: "el-input" } },
 		{ label: "密码", prop: "password", required: true, component: { name: "el-input" } },
-		{ label: "用户ID", prop: "userID", required: true, component: { name: "el-input-number" } },
+		// { label: "用户ID", prop: "userID", required: true, component: { name: "el-input-number" } },
 		{
 			label: "状态",
 			prop: "status",
@@ -63,12 +63,32 @@ const Upsert = useUpsert({
 			}
 		},
 		{
-			label: "session",
-			prop: "officialSession",
-			component: { name: "el-input", props: { type: "textarea", rows: 4 } }
+			label: "模式",
+			prop: "mode",
+			value: 0,
+			component: {
+				name: "el-radio-group",
+				props: {},
+				options: [
+					{ label: "账号密码自动登录", value: 0 },
+					{ label: "AccessToken手工刷新", value: 1 }
+				]
+			}
 		},
 		{
-			label: "备注",
+			label: "session",
+			prop: "officialSession",
+			component: {
+				name: "el-input",
+				props: {
+					type: "textarea",
+					rows: 4,
+					placeholder: "如果是手工刷新模式，此处填写AccessToken"
+				}
+			}
+		},
+		{
+			label: "账号备注",
 			prop: "remark",
 			component: { name: "el-input", props: { type: "textarea", rows: 4 } }
 		}
@@ -90,7 +110,14 @@ const Table = useTable({
 		{ label: "更新时间", prop: "updateTime", sortable: true },
 		{ label: "邮箱", prop: "email", sortable: true },
 		{ label: "密码", prop: "password", sortable: true },
-		{ label: "用户ID", prop: "userID", sortable: true },
+		{
+			label: "模式",
+			prop: "mode",
+			sortable: true,
+			formatter(_row, _column, value) {
+				return value == 0 ? "账号密码自动登录" : "AccessToken手工刷新";
+			}
+		},
 		{ label: "状态", prop: "status", component: { name: "cl-switch" }, sortable: true },
 		{ label: "PLUS", prop: "isPlus", component: { name: "cl-switch" }, sortable: true },
 		{

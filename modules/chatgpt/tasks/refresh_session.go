@@ -30,7 +30,12 @@ func RefreshSession(ctx g.Ctx) {
 		return
 	}
 	for _, v := range result {
+		// 如果 v.mode ==1  则跳过
 		g.Log().Info(ctx, "RefreshSession", v["email"], "start")
+		if v["mode"].Int() == 1 {
+			continue
+		}
+
 		getSessionUrl := config.CHATPROXY(ctx) + "/getsession"
 		refreshCookie := gjson.New(v["officialSession"]).Get("refreshCookie").String()
 		sessionVar := g.Client().SetHeader("authkey", config.AUTHKEY(ctx)).PostVar(ctx, getSessionUrl, g.Map{

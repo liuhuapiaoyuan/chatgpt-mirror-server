@@ -32,6 +32,7 @@
 import { useCrud, useTable, useUpsert } from "@cool-vue/crud";
 import { useCool } from "/@/cool";
 import { v4 as uuidv4 } from "uuid";
+import { ref } from "vue";
 const { service } = useCool();
 const shortcuts = [
 	{
@@ -75,9 +76,26 @@ const shortcuts = [
 		}
 	}
 ];
+// 检索
+const chatSessions = ref<Array<{ label: string; value: string }>>([]);
+
+service.chatgpt.session
+	.list()
+	.then((res) => {
+		chatSessions.value = res.map((item: any) => {
+			return {
+				label: item.email,
+				value: item.id
+			};
+		});
+	})
+	.catch(() => (chatSessions.value = []));
+
 // cl-upsert 配置
 const Upsert = useUpsert({
 	items: [
+		{ label: "登录账号", prop: "username", required: true, component: { name: "el-input" } },
+		{ label: "登录密码", prop: "password", required: true, component: { name: "el-input" } },
 		{ label: "UserToken", prop: "userToken", required: true, component: { name: "el-input" } },
 		{
 			label: "过期时间",
@@ -87,6 +105,28 @@ const Upsert = useUpsert({
 				props: { type: "datetime", valueFormat: "YYYY-MM-DD HH:mm:ss", shortcuts }
 			},
 			required: true
+		},
+		() => ({
+			label: "绑定OPENAI",
+			prop: "sessionId",
+			component: {
+				name: "el-select",
+				options: chatSessions.value,
+				props: {
+					multiple: false
+				}
+			}
+		}),
+		{
+			label: "聊天记录隔离",
+			prop: "isIsolate",
+			component: {
+				name: "el-switch",
+				props: {
+					activeValue: 1,
+					inactiveValue: 0
+				}
+			}
 		},
 		{
 			label: "PLUS",
@@ -123,6 +163,7 @@ const Table = useTable({
 		{ label: "UserToken", prop: "userToken", sortable: true },
 		{ label: "过期时间", prop: "expireTime", sortable: true },
 		{ label: "PLUS", prop: "isPlus", component: { name: "cl-switch" }, sortable: true },
+		{ label: "会话隔离", prop: "isIsolate", component: { name: "cl-switch" }, sortable: true },
 		{ label: "备注", prop: "remark", showOverflowTooltip: true, sortable: true },
 		{ type: "op", buttons: ["edit", "delete"] }
 	]

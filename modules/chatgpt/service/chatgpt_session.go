@@ -41,6 +41,11 @@ func (s *ChatgptSessionService) ModifyAfter(ctx g.Ctx, method string, param map[
 	if method != "Add" && method != "Update" {
 		return
 	}
+	//  如果是手工模式不用处理
+	if param["mode"] == 0 {
+		return
+	}
+
 	// 如果没有officialSession，就去获取
 	if param["officialSession"] == "" || param["officialSession"] == nil {
 		g.Log().Debug(ctx, "ChatgptSessionService.ModifyAfter", "officialSession is empty")
