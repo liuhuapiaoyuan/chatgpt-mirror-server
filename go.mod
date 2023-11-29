@@ -3,6 +3,7 @@ module chatgpt-mirror-server
 go 1.18
 
 require (
+	github.com/andybalholm/brotli v1.0.6
 	github.com/cool-team-official/cool-admin-go/contrib/drivers/mysql v1.5.2
 	github.com/cool-team-official/cool-admin-go/contrib/drivers/sqlite v1.5.2
 	github.com/cool-team-official/cool-admin-go/cool v1.5.2
@@ -16,7 +17,6 @@ require (
 
 require (
 	github.com/BurntSushi/toml v1.3.2 // indirect
-	github.com/andybalholm/brotli v1.0.6 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/clbanning/mxj v1.8.5-0.20200714211355-ff02cfb8ea28 // indirect
 	github.com/clbanning/mxj/v2 v2.7.0 // indirect
