@@ -24,6 +24,9 @@ services:
   chatgpt-mirror-server:
     image: xyhelper/chatgpt-mirror-server:latest
     restart: always
+    depends_on:
+      - mysql
+      - redis
     ports:
       - 8100:8001
     environment:
