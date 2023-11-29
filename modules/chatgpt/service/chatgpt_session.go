@@ -87,27 +87,13 @@ func (s *ChatgptSessionService) GetSessionByUserToken(ctx g.Ctx, userToken strin
 	userID := user["id"]
 	expireTime = user["expireTime"].String()
 	g.Log().Debug(ctx, "ChatgptSessionService.GetSessionByUserToken", "userID", userID)
-	record, err = cool.DBM(model.NewChatgptSession()).Where("userID", userID).One()
+
+	record, err = cool.DBM(model.NewChatgptSession()).Where("id", user["sessionId"]).One()
 	if err != nil {
 		return nil, "", err
 	}
 	if record.IsEmpty() {
-		// 随机选择一个 status=1  userID=0 的session
-		record, err = cool.DBM(model.NewChatgptSession()).Where("status", 1).Where("userID", 0).Where("isPlus", user["isPlus"]).One()
-		if err != nil {
-			return nil, "", err
-		}
-		if record.IsEmpty() {
-			return nil, "", gerror.New("没有可用的账号,请联系管理员")
-		}
-		_, err = cool.DBM(model.NewChatgptSession()).Where("id", record["id"]).Update(g.Map{
-			"userID": userID,
-		})
-		if err != nil {
-			return nil, "", err
-		}
-		// 清除历史会话
-		ClearChatHistory(ctx, record["officialSession"].String())
+		return nil, "", gerror.New("没有可用的ChatGpt账号,请联系管理员")
 	}
 
 	return

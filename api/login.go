@@ -50,35 +50,39 @@ func LoginPost(r *ghttp.Request) {
 		return
 	}
 	// 正常用户名密码登录
-	record, err := cool.DBM(model.NewChatgptSession()).Where(g.Map{
-		"email":    r.Get("username").String(),
-		"password": r.Get("password").String(),
-	}).One()
-	if err != nil {
-		g.Log().Error(ctx, "LoginPost", "err", err)
+	// record, err := cool.DBM(model.NewChatgptSession()).Where(g.Map{
+	// 	"email":    r.Get("username").String(),
+	// 	"password": r.Get("password").String(),
+	// }).One()
+	// if err != nil {
+	// 	g.Log().Error(ctx, "LoginPost", "err", err)
 
-		r.Response.WriteTpl("login.html", g.Map{
-			"username": r.Get("username").String(),
-			"error":    err.Error(),
-		})
-		return
-	}
-	if record.IsEmpty() {
-		r.Response.WriteTpl("login.html", g.Map{
-			"username": r.Get("username").String(),
-			"error":    "用户名或密码错误",
-		})
-		return
-	}
-	if record["userID"].Int() == 0 {
-		r.Response.WriteTpl("login.html", g.Map{
-			"username": r.Get("username").String(),
-			"error":    "未开通直登权限",
-		})
-		return
-	}
+	// 	r.Response.WriteTpl("login.html", g.Map{
+	// 		"username": r.Get("username").String(),
+	// 		"error":    err.Error(),
+	// 	})
+	// 	return
+	// }
+	// if record.IsEmpty() {
+	// 	r.Response.WriteTpl("login.html", g.Map{
+	// 		"username": r.Get("username").String(),
+	// 		"error":    "用户名或密码错误",
+	// 	})
+	// 	return
+	// }
+	// if record["userID"].Int() == 0 {
+	// 	r.Response.WriteTpl("login.html", g.Map{
+	// 		"username": r.Get("username").String(),
+	// 		"error":    "未开通直登权限",
+	// 	})
+	// 	return
+	// }
 	// 获取userToken
-	user, err := cool.DBM(model.NewChatgptUser()).Where("id=?", record["userID"].Int()).Where("expireTime>now()").One()
+	user, err := cool.DBM(model.NewChatgptUser()).Where(
+		g.Map{
+			"username": r.Get("username").String(),
+			"password": r.Get("password").String(),
+		}).Where("expireTime>now()").One()
 	if err != nil {
 		g.Log().Error(ctx, "LoginPost", "err", err)
 		r.Response.WriteTpl("login.html", g.Map{
@@ -94,6 +98,25 @@ func LoginPost(r *ghttp.Request) {
 		})
 		return
 	}
+	// 判断账号绑定情况
+	if user["sessionId"].String() == "" {
+		r.Response.WriteTpl("login.html", g.Map{
+			"username": r.Get("username").String(),
+			"error":    "没有可用的账号",
+		})
+		return
+	}
+
+	record2, err2 := cool.DBM(model.NewChatgptSession()).Where("id", user["sessionId"]).One()
+	if err2 != nil {
+		if record2.IsEmpty() {
+			r.Response.WriteTpl("login.html", g.Map{
+				"username": r.Get("username").String(),
+				"error":    "没有可用的ChatGpt账号,请联系管理员",
+			})
+		}
+	}
+
 	r.Session.Set("userToken", user["userToken"].String())
 	r.Response.RedirectTo("/")
 

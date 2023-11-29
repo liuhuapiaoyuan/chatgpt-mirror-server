@@ -27,31 +27,56 @@ func Session(r *ghttp.Request) {
 		r.Response.WriteStatus(http.StatusUnauthorized)
 		return
 	}
-	officialSession := gjson.New(record["officialSession"].String())
-	getSessionUrl := config.CHATPROXY(ctx) + "/getsession"
-	refreshCookie := officialSession.Get("refreshCookie").String()
-	sessionVar := g.Client().SetHeader("authkey", config.AUTHKEY(ctx)).PostVar(ctx, getSessionUrl, g.Map{
-		"username":      record["email"].String(),
-		"password":      record["password"].String(),
-		"authkey":       config.AUTHKEY(ctx),
-		"refreshCookie": refreshCookie,
-	})
-	sessionJson := gjson.New(sessionVar)
-	if sessionJson.Get("accessToken").String() == "" {
-		g.Log().Error(ctx, "get session error", sessionJson)
-		r.Response.WriteStatus(http.StatusUnauthorized)
-		return
-	}
-	cool.DBM(model.NewChatgptSession()).Where("email=?", record["email"].String()).Update(g.Map{
-		"officialSession": sessionJson.String(),
-	})
-	backendapi.AccessTokenCache.Set(ctx, userToken.String(), sessionJson.Get("accessToken").String(), 10*24*time.Hour)
-	sessionJson.Set("accessToken", userToken.String())
-	sessionJson.Set("user.email", "admin@openai.com")
-	sessionJson.Set("user.name", expireTime)
-	sessionJson.Set("user.image", "/avatars.png")
-	sessionJson.Set("user.picture", "/avatars.png")
-	sessionJson.Remove("refreshCookie")
 
-	r.Response.WriteJsonExit(sessionJson)
+	// 如果record mode==1
+	if record["mode"].Int() == 1 {
+		// 如果没有officialSession，就去获取
+		if record["officialSession"].String() == "" || record["officialSession"].String() == "null" {
+			g.Log().Error(ctx, "手工模式，没有token，无法登录")
+
+			r.Response.WriteStatus(http.StatusUnauthorized)
+			return
+		}
+		sessionJson := gjson.New("{}")
+		sessionJson.Set("accessToken", record["officialSession"].String())
+		backendapi.AccessTokenCache.Set(ctx, userToken.String(), sessionJson.Get("accessToken").String(), 10*24*time.Hour)
+		sessionJson.Set("accessToken", userToken.String())
+		sessionJson.Set("user.email", "admin@openai.com")
+		sessionJson.Set("user.name", expireTime)
+		sessionJson.Set("user.image", "/avatars.png")
+		sessionJson.Set("user.picture", "/avatars.png")
+		sessionJson.Remove("refreshCookie")
+
+		r.Response.WriteJsonExit(sessionJson)
+	} else {
+		officialSession := gjson.New(record["officialSession"].String())
+		getSessionUrl := config.CHATPROXY(ctx) + "/getsession"
+		refreshCookie := officialSession.Get("refreshCookie").String()
+		sessionVar := g.Client().SetHeader("authkey", config.AUTHKEY(ctx)).PostVar(ctx, getSessionUrl, g.Map{
+			"username":      record["email"].String(),
+			"password":      record["password"].String(),
+			"authkey":       config.AUTHKEY(ctx),
+			"refreshCookie": refreshCookie,
+		})
+		sessionJson := gjson.New(sessionVar)
+		if sessionJson.Get("accessToken").String() == "" {
+			g.Log().Error(ctx, "get session error", sessionJson)
+			r.Response.WriteStatus(http.StatusUnauthorized)
+			return
+		}
+		cool.DBM(model.NewChatgptSession()).Where("email=?", record["email"].String()).Update(g.Map{
+			"officialSession": sessionJson.String(),
+		})
+		backendapi.AccessTokenCache.Set(ctx, userToken.String(), sessionJson.Get("accessToken").String(), 10*24*time.Hour)
+		sessionJson.Set("accessToken", userToken.String())
+		sessionJson.Set("user.email", "admin@openai.com")
+		sessionJson.Set("user.name", expireTime)
+		sessionJson.Set("user.image", "/avatars.png")
+		sessionJson.Set("user.picture", "/avatars.png")
+		sessionJson.Remove("refreshCookie")
+
+		r.Response.WriteJsonExit(sessionJson)
+
+	}
+
 }

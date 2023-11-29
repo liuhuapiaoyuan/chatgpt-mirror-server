@@ -14,6 +14,7 @@ func Me(r *ghttp.Request) {
 	// 获取header中的token Authorization: Bearer xxx 去掉Bearer
 	userToken := r.Header.Get("Authorization")[7:]
 	record, expireTime, err := ChatgptSessionService.GetSessionByUserToken(ctx, userToken)
+	g.Log().Info(ctx, "expireTime", expireTime)
 	if err != nil {
 		g.Log().Error(ctx, err)
 		r.Response.WriteStatus(http.StatusUnauthorized)
@@ -24,8 +25,16 @@ func Me(r *ghttp.Request) {
 		r.Response.WriteStatus(http.StatusUnauthorized)
 		return
 	}
-	officialSession := gjson.New(record["officialSession"].String())
-	AccessToken := officialSession.Get("accessToken").String()
+	AccessToken := ""
+	// 如果 record mode ==1
+	if record["mode"].Int() == 1 {
+		AccessToken = record["officialSession"].String()
+	} else {
+		officialSession := gjson.New(record["officialSession"].String())
+		AccessToken = officialSession.Get("accessToken").String()
+
+	}
+
 	UpStream := config.CHATPROXY(ctx)
 	// 请求后端接口
 	res, err := g.Client().SetHeaderMap(map[string]string{
@@ -45,7 +54,7 @@ func Me(r *ghttp.Request) {
 	}
 	resJson := gjson.New(resStr)
 	resJson.Set("email", "admin@openai.com")
-	resJson.Set("name", expireTime)
+	//resJson.Set("name", record["email"].String())
 	resJson.Set("picture", "/avatars.png")
 	resJson.Set("phone_number", "+1911")
 	resJson.Set("orgs.data.0.description", "OpenAI")
