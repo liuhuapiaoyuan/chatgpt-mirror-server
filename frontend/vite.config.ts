@@ -15,6 +15,8 @@ function resolve(dir: string) {
 
 export default (): UserConfig => {
 	return {
+		host: true, // Here
+  		strictPort: true,
 		base: "/xyhelper/",
 		plugins: [
 			vue(),

@@ -10,6 +10,7 @@
       rel="stylesheet"
       href="/ulp/react-components/1.66.5/css/main.cdn.min.css"
     />
+    <title>{{.website_title}}</title>
     <style id="custom-styles-container">
       body {
         background: #ffffff;
@@ -490,6 +491,9 @@
                 </div>
               </div>
               {{end}}
+              <div>
+                {{.customer_service_link}}
+              </div>
             </div>
           </div>
         </section>
@@ -1020,10 +1024,10 @@
       function updateHeader(text) {
         const $h1 = document.querySelector("main header > h1");
         if ($h1) {
-          $h1.innerText = text;
+          $h1.innerHTML = text;
         }
       }
-      updateHeader("欢迎回来！");
+      updateHeader( "{{.login_slogan}}<br/>{{.website_title}}");
       window.addEventListener("load", function () {
         const submitBtn = document.querySelector("#submit-token");
         submitBtn.addEventListener("click", function () {

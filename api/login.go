@@ -5,16 +5,47 @@ import (
 	"chatgpt-mirror-server/modules/chatgpt/model"
 
 	"github.com/cool-team-official/cool-admin-go/cool"
+	basemodel "github.com/cool-team-official/cool-admin-go/modules/base/model"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
 )
 
 func Login(r *ghttp.Request) {
 	ctx := r.GetCtx()
-	if r.Session.MustGet("userToken").IsEmpty() {
+	list, err := cool.DBM(basemodel.NewBaseSysParam()).WhereLike("keyName", "chatgpt.%").All()
+	if err != nil {
+		g.Log().Error(ctx, "Login", "err", err)
 		r.Response.WriteTpl("login.html", g.Map{
 			"ONLYTOKEN": config.ONLYTOKEN(ctx),
+			"error":     err.Error(),
 		})
+		return
+	}
+
+	pageModel := g.Map{
+		"ONLYTOKEN":             config.ONLYTOKEN(ctx),
+		"website_title":         "ChatGPT",
+		"login_slogan":          "欢迎回来",
+		"customer_service_link": "",
+	}
+	for _, record := range list {
+		keyName := record["keyName"].String()
+		value := record["data"].String()
+		switch keyName {
+		case "chatgpt.website_title":
+			pageModel["website_title"] = value
+		case "chatgpt.login_slogan":
+			pageModel["login_slogan"] = value
+		case "chatgpt.customer_service_link":
+			pageModel["customer_service_link"] = value
+		}
+	}
+
+	g.Log().Debug(ctx, "Login", "list", pageModel)
+
+	if r.Session.MustGet("userToken").IsEmpty() {
+
+		r.Response.WriteTpl("login.html", pageModel)
 
 	} else {
 		r.Response.RedirectTo("/")
