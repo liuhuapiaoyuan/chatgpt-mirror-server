@@ -1,9 +1,9 @@
 package api
 
 import (
-	backendapi "chatgpt-mirror-server/backend-api"
 	"chatgpt-mirror-server/config"
 	"chatgpt-mirror-server/modules/chatgpt/model"
+	"chatgpt-mirror-server/modules/chatgpt/service"
 	"net/http"
 	"time"
 
@@ -39,7 +39,7 @@ func Session(r *ghttp.Request) {
 		}
 		sessionJson := gjson.New("{}")
 		sessionJson.Set("accessToken", record["officialSession"].String())
-		backendapi.AccessTokenCache.Set(ctx, userToken.String(), sessionJson.Get("accessToken").String(), 10*24*time.Hour)
+		service.AccessTokenCache.Set(ctx, userToken.String(), sessionJson.Get("accessToken").String(), 10*24*time.Hour)
 		sessionJson.Set("accessToken", userToken.String())
 		sessionJson.Set("user.email", "admin@openai.com")
 		sessionJson.Set("user.name", expireTime)
@@ -67,7 +67,7 @@ func Session(r *ghttp.Request) {
 		cool.DBM(model.NewChatgptSession()).Where("email=?", record["email"].String()).Update(g.Map{
 			"officialSession": sessionJson.String(),
 		})
-		backendapi.AccessTokenCache.Set(ctx, userToken.String(), sessionJson.Get("accessToken").String(), 10*24*time.Hour)
+		service.AccessTokenCache.Set(ctx, userToken.String(), sessionJson.Get("accessToken").String(), 10*24*time.Hour)
 		sessionJson.Set("accessToken", userToken.String())
 		sessionJson.Set("user.email", "admin@openai.com")
 		sessionJson.Set("user.name", expireTime)

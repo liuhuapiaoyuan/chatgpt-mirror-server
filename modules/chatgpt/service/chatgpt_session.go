@@ -3,17 +3,24 @@ package service
 import (
 	"chatgpt-mirror-server/config"
 	"chatgpt-mirror-server/modules/chatgpt/model"
+	"chatgpt-mirror-server/utility"
+	"time"
 
 	"github.com/cool-team-official/cool-admin-go/cool"
 	"github.com/gogf/gf/v2/database/gdb"
 	"github.com/gogf/gf/v2/encoding/gjson"
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/os/gcache"
 )
 
 type ChatgptSessionService struct {
 	*cool.Service
 }
+
+var (
+	AccessTokenCache = gcache.New()
+)
 
 func NewChatgptSessionService() *ChatgptSessionService {
 	return &ChatgptSessionService{
@@ -96,6 +103,44 @@ func (s *ChatgptSessionService) GetSessionByUserToken(ctx g.Ctx, userToken strin
 		return nil, "", gerror.New("没有可用的ChatGpt账号,请联系管理员")
 	}
 
+	record["user_username"] = user["username"]
+	return
+}
+
+// 统一封装token的获取
+func (s *ChatgptSessionService) GetAccessToken(ctx g.Ctx, userToken string) (userId int, accessToken string, err2 error) {
+	user, err2 := cool.DBM(model.NewChatgptUser()).Where("userToken", userToken).One()
+	if err2 != nil {
+		g.Log().Error(ctx, err2)
+		return
+	}
+	userId = user["id"].Int()
+
+	officialAccessToken := AccessTokenCache.MustGet(ctx, userToken).String()
+	if officialAccessToken == "" {
+		record, _, err := s.GetSessionByUserToken(ctx, userToken)
+		err2 = err
+		if err != nil {
+			g.Log().Error(ctx, err)
+			return
+		}
+		if record.IsEmpty() {
+			g.Log().Error(ctx, "session is empty")
+			return
+		}
+		officialSession := record["officialSession"].String()
+		if officialSession == "" {
+			err2 = gerror.New("officialSession is empty")
+			return
+		}
+
+		officialAccessToken = officialSession
+		if record["mode"].Int() != 1 {
+			officialAccessToken = utility.AccessTokenFormSession(officialSession)
+		}
+		AccessTokenCache.Set(ctx, userToken, officialAccessToken, time.Minute)
+	}
+	accessToken = officialAccessToken
 	return
 }
 
