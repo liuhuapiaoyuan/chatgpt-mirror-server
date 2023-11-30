@@ -140,8 +140,15 @@ func CreateConversation(ctx g.Ctx, userId int, AccessToken string, userAgent str
 	history.CreateTime = resJson.Get("create_time").Time()
 	history.UpdateTime = resJson.Get("update_time").Time()
 	history.ConversationId = resJson.Get("conversation_id").String()
-	history.ConversationTemplate_id = resJson.Get("conversationTemplate_id").String()
-	history.GizmoId = resJson.Get("gizmo_id").String()
+
+	conversationTemplateId := resJson.Get("conversation_template_id").String()
+	if conversationTemplateId != "" {
+		history.ConversationTemplate_id = conversationTemplateId
+	}
+	gizmo_id := resJson.Get("gizmo_id").String()
+	if gizmo_id != "" {
+		history.GizmoId = gizmo_id
+	}
 	cool.DBM(model.NewChatgptHistory()).InsertAndGetId(history)
 }
 

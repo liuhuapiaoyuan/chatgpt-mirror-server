@@ -163,11 +163,11 @@ const Table = useTable({
 		{ label: "UserToken", prop: "userToken", sortable: true },
 		{ label: "过期时间", prop: "expireTime", sortable: true },
 		{ label: "PLUS", prop: "isPlus", component: { name: "cl-switch" }, sortable: true },
-//		{ label: "会话隔离", prop: "isIsolate", component: { name: "cl-switch" }, sortable: true },
+		{ label: "会话隔离", prop: "isIsolate", component: { name: "cl-switch" }, sortable: true },
 		{ label: "备注", prop: "remark", showOverflowTooltip: true, sortable: true },
 		{ type: "op", buttons: ["edit", "delete"] }
 	]
-});  
+});
 
 // cl-crud 配置
 const Crud = useCrud(

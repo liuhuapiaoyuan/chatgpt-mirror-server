@@ -21,6 +21,10 @@ func Conversations(r *ghttp.Request) {
 		return
 	}
 	userId := user["id"].Int()
+	if !user["is_isolate"].Bool() {
+		ProxyAll(r)
+		return
+	}
 
 	// 获得分页参数 s?offset=0&limit=28&order=updated
 	offset := r.GetQuery("offset").Int()
@@ -47,6 +51,12 @@ func Conversations(r *ghttp.Request) {
 		}
 		if updateTime, ok := record["updateTime"]; ok {
 			record["update_time"] = updateTime
+		}
+		if record["conversation_template_id"].String() == "" {
+			delete(record, "conversation_template_id")
+		}
+		if record["gizmo_id"].String() == "" {
+			delete(record, "gizmo_id")
 		}
 	}
 
