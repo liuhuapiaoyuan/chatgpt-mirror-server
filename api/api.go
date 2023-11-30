@@ -32,6 +32,7 @@ func init() {
 	group.GET("/g/:gizmoId/c/:convId", GC)
 
 	group.GET("/login", Login)
+	group.GET("/share/:shareId", Share)
 	group.POST("/login", LoginPost)
 	group.ALL("/login_token", LoginToken)
 	group.GET("/auth/logout", Logout)
