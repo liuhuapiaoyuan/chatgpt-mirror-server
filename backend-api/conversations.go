@@ -21,7 +21,7 @@ func Conversations(r *ghttp.Request) {
 		return
 	}
 	userId := user["id"].Int()
-	if !user["is_isolate"].Bool() {
+	if !user["isIsolate"].Bool() {
 		ProxyAll(r)
 		return
 	}
