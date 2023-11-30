@@ -48,9 +48,3 @@ modules:
         enable: 1
       log:
         enable: 1
-# 接入网关地址
-CHATPROXY: "https://demo.xyhelper.cn"
-# 接入网关的authkey
-AUTHKEY: "xyhelper"
-ONLYTOKEN: false
-CDNHOST: "https://file.chatgpt.ggss.club"
