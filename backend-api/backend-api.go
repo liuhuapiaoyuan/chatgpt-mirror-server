@@ -82,15 +82,14 @@ func ProxyAll(r *ghttp.Request) {
 	proxy.ModifyResponse = func(response *http.Response) error {
 		path := response.Request.URL.Path
 		// 如果path 以 ‘backend-api/files’ startwith开头
-		isDownload := strings.HasPrefix(path, "/backend-api/files") && strings.HasSuffix(path, "download")
-		isGizmosInfo := strings.HasPrefix(path, "/backend-api/gizmos/")
-		isUpdateFile := strings.HasPrefix(path, "/backend-api/files") && r.Request.Method == "POST"
+		// isDownload := strings.HasPrefix(path, "/backend-api/files") && strings.HasSuffix(path, "download")
+		// isGizmosInfo := strings.HasPrefix(path, "/backend-api/gizmos/")
+		// isUpdateFile := strings.HasPrefix(path, "/backend-api/files") && r.Request.Method == "POST"
 		isCreateConversation := strings.HasPrefix(path, "/backend-api/conversation/gen_title")
 		if isCreateConversation {
 			CreateConversation(ctx, userId, accessToken, r.UserAgent(), path)
-		}
+		} else {
 
-		if isDownload || isUpdateFile || isGizmosInfo {
 			g.Log().Info(ctx, "path", path)
 			g.Log().Info(ctx, "path content-type",
 				response.Header.Get("Content-Type"))
@@ -108,6 +107,7 @@ func ProxyAll(r *ghttp.Request) {
 			// 删除Content-Encoding头部
 			response.Header.Del("Content-Encoding")
 		}
+
 		return nil
 	}
 
