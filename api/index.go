@@ -59,8 +59,9 @@ func Index(r *ghttp.Request) {
 	propsJson.Set("buildId", config.BuildId)
 
 	r.Response.WriteTpl("chat-"+config.BuildDate+".html", g.Map{
-		"props":     propsJson,
-		"arkoseUrl": config.ArkoseUrl,
+		"props":        propsJson,
+		"staticCdnUrl": config.StaticCdnUrl,
+		"arkoseUrl":    config.ArkoseUrl,
 	})
 }
 func C(r *ghttp.Request) {
@@ -110,8 +111,9 @@ func C(r *ghttp.Request) {
 	propsJson.Set("query.default.1", chatId)
 	propsJson.Set("buildId", config.BuildId)
 	r.Response.WriteTpl("chat-"+config.BuildDate+".html", g.Map{
-		"props":     propsJson,
-		"arkoseUrl": config.ArkoseUrl,
+		"props":        propsJson,
+		"staticCdnUrl": config.StaticCdnUrl,
+		"arkoseUrl":    config.ArkoseUrl,
 	})
 }
 
@@ -160,8 +162,9 @@ func Discovery(r *ghttp.Request) {
 	propsJson.Set("buildId", config.BuildId)
 
 	r.Response.WriteTpl("discovery-"+config.BuildDate+".html", g.Map{
-		"arkoseUrl": config.ArkoseUrl,
-		"props":     propsJson,
+		"arkoseUrl":    config.ArkoseUrl,
+		"staticCdnUrl": config.StaticCdnUrl,
+		"props":        propsJson,
 	})
 }
 
@@ -217,8 +220,9 @@ func Editor(r *ghttp.Request) {
 	// propsJson.Dump()
 
 	r.Response.WriteTpl("editor-"+config.BuildDate+".html", g.Map{
-		"arkoseUrl": config.ArkoseUrl,
-		"props":     propsJson,
+		"arkoseUrl":    config.ArkoseUrl,
+		"props":        propsJson,
+		"staticCdnUrl": config.StaticCdnUrl,
 	})
 }
 
@@ -270,8 +274,9 @@ func Slug(r *ghttp.Request) {
 	propsJson.Set("query.slug", slug)
 	propsJson.Set("buildId", config.BuildId)
 	r.Response.WriteTpl("slug-"+config.BuildDate+".html", g.Map{
-		"arkoseUrl": config.ArkoseUrl,
-		"props":     propsJson,
+		"arkoseUrl":    config.ArkoseUrl,
+		"staticCdnUrl": config.StaticCdnUrl,
+		"props":        propsJson,
 	})
 }
 
@@ -324,8 +329,9 @@ func G(r *ghttp.Request) {
 	propsJson.Set("buildId", config.BuildId)
 
 	r.Response.WriteTpl("g-"+config.BuildDate+".html", g.Map{
-		"arkoseUrl": config.ArkoseUrl,
-		"props":     propsJson,
+		"arkoseUrl":    config.ArkoseUrl,
+		"staticCdnUrl": config.StaticCdnUrl,
+		"props":        propsJson,
 	})
 }
 
@@ -382,7 +388,8 @@ func GC(r *ghttp.Request) {
 	propsJson.Set("buildId", config.BuildId)
 
 	r.Response.WriteTpl("gc-"+config.BuildDate+".html", g.Map{
-		"arkoseUrl": config.ArkoseUrl,
-		"props":     propsJson,
+		"arkoseUrl":    config.ArkoseUrl,
+		"staticCdnUrl": config.StaticCdnUrl,
+		"props":        propsJson,
 	})
 }
