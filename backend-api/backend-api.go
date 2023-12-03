@@ -106,7 +106,6 @@ func ProxyAll(r *ghttp.Request) {
 			// 更新Content-Length
 			response.ContentLength = int64(len(modifiedBody))
 			response.Header.Set("Content-Length", strconv.Itoa(len(modifiedBody)))
-
 			// 删除Content-Encoding头部
 			response.Header.Del("Content-Encoding")
 		}
@@ -157,7 +156,10 @@ func CreateConversation(ctx g.Ctx, userId int, AccessToken string, userAgent str
 
 // 处理删除消息
 func RemoveCreateConversation(ctx g.Ctx, response *http.Response, conversationPath string) {
-	id := strings.Split(conversationPath, "/")[4]
+	g.Log().Debug(ctx, "RemoveCreateConversation", conversationPath)
+	id := strings.Split(conversationPath, "/")[3]
+	g.Log().Info(ctx, "提取出的ID", id)
+
 	originalBody, shouldReturn, err := loadRespString(response)
 	if err != nil || shouldReturn {
 		return
@@ -167,6 +169,13 @@ func RemoveCreateConversation(ctx g.Ctx, response *http.Response, conversationPa
 	if resJson.Get("success").Bool() {
 		cool.DBM(model.NewChatgptHistory()).Where("conversation_id", id).Delete()
 	}
+	modifiedBody := string(originalBody)
+	response.Body = io.NopCloser(bytes.NewBufferString(modifiedBody))
+	// 更新Content-Length
+	response.ContentLength = int64(len(modifiedBody))
+	response.Header.Set("Content-Length", strconv.Itoa(len(modifiedBody)))
+	// 删除Content-Encoding头部
+	response.Header.Del("Content-Encoding")
 
 }
 
