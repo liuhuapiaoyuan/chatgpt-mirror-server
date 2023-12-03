@@ -57,6 +57,7 @@ modules:
 
 # 接入网关地址
 CHATPROXY: "https://demo.xyhelper.cn"
+#CHATPROXY: "https://gateway.chatgpt.ggss.club"
 #CHATPROXY: "http://192.168.0.138:5000"
 # 接入网关的authkey
 AUTHKEY: "xyhelper"

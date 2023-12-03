@@ -85,9 +85,12 @@ func ProxyAll(r *ghttp.Request) {
 		isDownload := strings.HasPrefix(path, "/backend-api/files") && strings.HasSuffix(path, "download")
 		isGizmosInfo := strings.HasPrefix(path, "/backend-api/gizmos/")
 		isUpdateFile := strings.HasPrefix(path, "/backend-api/files") && r.Request.Method == "POST"
+		isRemoveConversation := strings.HasPrefix(path, "/backend-api/conversation") && r.Request.Method == "PATCH"
 		isCreateConversation := strings.HasPrefix(path, "/backend-api/conversation/gen_title")
 		if isCreateConversation {
 			CreateConversation(ctx, userId, accessToken, r.UserAgent(), path)
+		} else if isRemoveConversation {
+			RemoveCreateConversation(ctx, response, path)
 		} else if isDownload || isUpdateFile || isGizmosInfo {
 
 			g.Log().Info(ctx, "path", path)
@@ -150,6 +153,21 @@ func CreateConversation(ctx g.Ctx, userId int, AccessToken string, userAgent str
 		history.GizmoId = gizmo_id
 	}
 	cool.DBM(model.NewChatgptHistory()).InsertAndGetId(history)
+}
+
+// 处理删除消息
+func RemoveCreateConversation(ctx g.Ctx, response *http.Response, conversationPath string) {
+	id := strings.Split(conversationPath, "/")[4]
+	originalBody, shouldReturn, err := loadRespString(response)
+	if err != nil || shouldReturn {
+		return
+	}
+	resJson := gjson.New(string(originalBody))
+	g.Log().Info(ctx, "conversation will removed", resJson)
+	if resJson.Get("success").Bool() {
+		cool.DBM(model.NewChatgptHistory()).Where("conversation_id", id).Delete()
+	}
+
 }
 
 func loadRespString(response *http.Response) ([]byte, bool, error) {

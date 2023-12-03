@@ -48,7 +48,7 @@ func init() {
 	if !arkoseUrl.IsEmpty() {
 		ArkoseUrl = arkoseUrl.String()
 	}
-	staticCdnUrl := g.Cfg().MustGetWithEnv(ctx, "StaticCdnUrl")
+	staticCdnUrl := g.Cfg().MustGetWithEnv(ctx, "STATIC_CDN_URL")
 	if !staticCdnUrl.IsEmpty() {
 		StaticCdnUrl = staticCdnUrl.String()
 	}

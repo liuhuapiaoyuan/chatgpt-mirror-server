@@ -34,7 +34,7 @@ services:
       # 接入网关地址
       CHATPROXY: "https://demo.xyhelper.cn"
       # 增加静态资源CDN地址
-      StaticCdnUrl: ""
+      STATIC_CDN_URL: ""
       # 接入网关的authkey
       AUTHKEY: "xyhelper"
       # 是否只使用token验证
