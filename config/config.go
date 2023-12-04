@@ -27,7 +27,9 @@ var (
 	DefaultModel = "text-davinci-002-render-sha"
 	FreeModels   = garray.NewStrArray()
 	PlusModels   = garray.NewStrArray()
-	ArkoseUrl    = "https://tcr9i.xyhelper.cn/v2/"
+	ArkoseUrl    = "https://tcr9i-2.xyhelper.cn/v2/"
+	// 静态资源cdn
+	StaticCdnUrl = ""
 	BuildDate    = "20231119"
 	BuildId      = "o6pcj5Ej867CTUO0qdR1G"
 )
@@ -45,6 +47,10 @@ func init() {
 	arkoseUrl := g.Cfg().MustGetWithEnv(ctx, "ARKOSE_URL")
 	if !arkoseUrl.IsEmpty() {
 		ArkoseUrl = arkoseUrl.String()
+	}
+	staticCdnUrl := g.Cfg().MustGetWithEnv(ctx, "StaticCdnUrl")
+	if !staticCdnUrl.IsEmpty() {
+		StaticCdnUrl = staticCdnUrl.String()
 	}
 
 }
