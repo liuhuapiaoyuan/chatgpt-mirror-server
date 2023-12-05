@@ -49,24 +49,29 @@ func Session(r *ghttp.Request) {
 
 		r.Response.WriteJsonExit(sessionJson)
 	} else {
-		officialSession := gjson.New(record["officialSession"].String())
-		getSessionUrl := config.CHATPROXY(ctx) + "/getsession"
-		refreshCookie := officialSession.Get("refreshCookie").String()
-		sessionVar := g.Client().SetHeader("authkey", config.AUTHKEY(ctx)).PostVar(ctx, getSessionUrl, g.Map{
-			"username":      record["email"].String(),
-			"password":      record["password"].String(),
-			"authkey":       config.AUTHKEY(ctx),
-			"refreshCookie": refreshCookie,
-		})
-		sessionJson := gjson.New(sessionVar)
-		if sessionJson.Get("accessToken").String() == "" {
-			g.Log().Error(ctx, "get session error", sessionJson)
-			r.Response.WriteStatus(http.StatusUnauthorized)
-			return
+		sessionJson := gjson.New(record["officialSession"].String())
+		getSessionUrl := config.CHATPROXY(ctx) + "/auth/token"
+		expires := sessionJson.Get("expires").Time()
+
+		// 判断是否过期
+		if expires.Before(time.Now()) {
+			g.Log().Info(ctx, "session 过期，重新获取")
+			sessionVar := g.Client().SetHeader("authkey", config.AUTHKEY(ctx)).PostVar(ctx, getSessionUrl, g.Map{
+				"username": record["email"].String(),
+				"password": record["password"].String(),
+				"authkey":  config.AUTHKEY(ctx),
+			})
+			sessionJson = gjson.New(sessionVar)
+			if sessionJson.Get("accessToken").String() == "" {
+				g.Log().Error(ctx, "get session error", sessionJson)
+				r.Response.WriteStatus(http.StatusUnauthorized)
+				return
+			}
+			cool.DBM(model.NewChatgptSession()).Where("email=?", record["email"].String()).Update(g.Map{
+				"officialSession": sessionJson.String(),
+			})
 		}
-		cool.DBM(model.NewChatgptSession()).Where("email=?", record["email"].String()).Update(g.Map{
-			"officialSession": sessionJson.String(),
-		})
+
 		service.AccessTokenCache.Set(ctx, userToken.String(), sessionJson.Get("accessToken").String(), 10*24*time.Hour)
 		sessionJson.Set("accessToken", userToken.String())
 		sessionJson.Set("user.email", "admin@openai.com")

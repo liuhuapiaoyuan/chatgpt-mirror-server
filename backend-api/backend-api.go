@@ -6,6 +6,7 @@ import (
 	"chatgpt-mirror-server/modules/chatgpt/model"
 	"chatgpt-mirror-server/modules/chatgpt/service"
 	"compress/gzip"
+	"crypto/tls"
 	"io"
 	"net/http"
 	"net/http/httputil"
@@ -41,20 +42,12 @@ func NotFound(r *ghttp.Request) {
 	r.Response.WriteStatus(http.StatusNotFound)
 }
 
-// // 接受json字符串，处理完成后返回json字符串
-// func _conversationListProcess(json string) {
-// 	// 1. 转换成json对象
-
-// 	// 2. 遍历每一个conversation
-// 	// 3. 调用GetHistoryByUserIdAndConversationIds
-// 	// 4. 将返回的结果添加到conversation中
-// 	// 5. 返回json字符串
-// }
-
 func ProxyAll(r *ghttp.Request) {
+
 	ctx := r.GetCtx()
 	// 获取header中的token Authorization: Bearer xxx 去掉Bearer
 	userToken := r.Header.Get("Authorization")[7:]
+	isStream := strings.Contains(r.Header.Get("accept"), "text/event-stream")
 
 	userId, accessToken, err := ChatgptSessionService.GetAccessToken(ctx, userToken)
 
@@ -66,6 +59,9 @@ func ProxyAll(r *ghttp.Request) {
 	UpStream := config.CHATPROXY(ctx)
 	u, _ := url.Parse(UpStream)
 	proxy := httputil.NewSingleHostReverseProxy(u)
+	proxy.Transport = &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
 	proxy.ErrorHandler = func(writer http.ResponseWriter, request *http.Request, e error) {
 		g.Log().Error(ctx, e)
 		writer.WriteHeader(http.StatusBadGateway)
@@ -77,25 +73,18 @@ func ProxyAll(r *ghttp.Request) {
 	newreq.Header.Set("authkey", config.AUTHKEY(ctx))
 	newreq.Header.Set("Authorization", "Bearer "+accessToken)
 
+	newreq.Header.Set("Host", "chat.openai.com")
+	newreq.Header.Set("Origin", "https://chat.openai.com/chat")
+
 	// g.Dump(newreq.URL)
 	cdnhost := config.CDNHOST(ctx)
 	proxy.ModifyResponse = func(response *http.Response) error {
 		path := response.Request.URL.Path
 		// 如果path 以 ‘backend-api/files’ startwith开头
-		isDownload := strings.HasPrefix(path, "/backend-api/files") && strings.HasSuffix(path, "download")
-		isGizmosInfo := strings.HasPrefix(path, "/backend-api/gizmos/")
-		isUpdateFile := strings.HasPrefix(path, "/backend-api/files") && r.Request.Method == "POST"
-		isRemoveConversation := strings.HasPrefix(path, "/backend-api/conversation") && r.Request.Method == "PATCH"
 		isCreateConversation := strings.HasPrefix(path, "/backend-api/conversation/gen_title")
 		if isCreateConversation {
 			CreateConversation(ctx, userId, accessToken, r.UserAgent(), path)
-		} else if isRemoveConversation {
-			RemoveCreateConversation(ctx, response, path)
-		} else if isDownload || isUpdateFile || isGizmosInfo {
-
-			g.Log().Info(ctx, "path", path)
-			g.Log().Info(ctx, "path content-type",
-				response.Header.Get("Content-Type"))
+		} else if !isStream {
 			originalBody, shouldReturn, returnValue := loadRespString(response)
 			if shouldReturn {
 				return returnValue
