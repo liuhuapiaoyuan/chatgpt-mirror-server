@@ -7,7 +7,7 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     env:
-      REMOTE_CONTAINERS: true
+      REMOTE_CONTAINERS: "true"
     steps:
     - name: 代码拉取
       uses: actions/checkout@v2
