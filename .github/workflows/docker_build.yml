@@ -6,6 +6,8 @@ on:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+    env:
+      REMOTE_CONTAINERS: true
     steps:
     - name: 代码拉取
       uses: actions/checkout@v2
@@ -24,7 +26,7 @@ jobs:
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
-        
+
     - name: Release
       run: |
         chmod +x ./release.sh

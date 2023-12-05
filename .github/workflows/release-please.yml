@@ -7,7 +7,7 @@ permissions:
   contents: write
   pull-requests: write
 
-name: auto-release
+name: 自动版本日志
 
 jobs:
   release-please:
