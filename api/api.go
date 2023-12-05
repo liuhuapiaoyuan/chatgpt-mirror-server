@@ -24,12 +24,15 @@ func init() {
 	// s.SetServerRoot("./resource/public/" + config.BuildDate)
 	group := s.Group("/")
 	group.GET("/", Index)
-	group.GET("/c/:ChatId", C)
+	group.GET("/c/:convId", C)
 	group.GET("/g/:gizmoId", G)
 	group.GET("/gpts/discovery", Discovery)
 	group.GET("/gpts/editor", Editor)
 	group.GET("/gpts/editor/:slug", Slug)
 	group.GET("/g/:gizmoId/c/:convId", GC)
+	group.GET(("/gpts/mine"), Mine)
+
+	// s.BindHandler("/_next/data/*any", Next)
 
 	group.GET("/login", Login)
 	group.GET("/share/:shareId", Share)
