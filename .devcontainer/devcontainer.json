@@ -16,11 +16,9 @@
     "vscode": {
       "extensions": [
         "ms-ceintl.vscode-language-pack-zh-hans",
-        "GitHub.vscode-pull-request-github",
-        "github.copilot",
         "esbenp.prettier-vscode",
         "vue.volar",
-        "cweijan.vscode-database-client2"
+        "sourcegraph.cody-ai"
       ]
     }
   },
