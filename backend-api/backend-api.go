@@ -49,7 +49,10 @@ func ProxyAll(r *ghttp.Request) {
 
 	userToken := r.Header.Get("Authorization")[7:]
 	isStream := strings.Contains(r.Header.Get("accept"), "text/event-stream")
+	// 获得当前的请求域名
+	// g.Log().Debug(ctx, "ProxyAll", r.URL.Path, r.Header.Get("accept"), isStream)
 
+	domain := r.Host
 	userId, accessToken, err := ChatgptSessionService.GetAccessToken(ctx, userToken)
 
 	if err != nil {
@@ -83,8 +86,23 @@ func ProxyAll(r *ghttp.Request) {
 		path := response.Request.URL.Path
 		// 如果path 以 ‘backend-api/files’ startwith开头
 		isCreateConversation := strings.HasPrefix(path, "/backend-api/conversation/gen_title")
+		isShare := strings.HasPrefix(path, "/backend-api/share/creat")
+
 		if isCreateConversation {
 			CreateConversation(ctx, userId, accessToken, r.UserAgent(), path)
+		} else if isShare {
+			originalBody, shouldReturn, returnValue := loadRespString(response)
+			if shouldReturn {
+				return returnValue
+			}
+			modifiedBody := strings.Replace(string(originalBody), "chat.openai.com/share", domain+"/share", -1)
+			// 将修改后的内容写回响应体
+			response.Body = io.NopCloser(bytes.NewBufferString(modifiedBody))
+			// 更新Content-Length
+			response.ContentLength = int64(len(modifiedBody))
+			response.Header.Set("Content-Length", strconv.Itoa(len(modifiedBody)))
+			// 删除Content-Encoding头部
+			response.Header.Del("Content-Encoding")
 		} else if !isStream {
 			originalBody, shouldReturn, returnValue := loadRespString(response)
 			if shouldReturn {

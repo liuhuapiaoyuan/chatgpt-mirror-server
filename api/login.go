@@ -150,7 +150,7 @@ func LoginPost(r *ghttp.Request) {
 		}
 	}
 
-	officialSession := user["officialSession"].String()
+	officialSession := record2["officialSession"].String()
 	r.Session.Set("offical-session", officialSession)
 	r.Session.Set("userToken", user["userToken"].String())
 	r.Response.RedirectTo("/")
