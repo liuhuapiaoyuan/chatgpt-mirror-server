@@ -19,7 +19,8 @@ func Session(r *ghttp.Request) {
 	record, expireTime, err := ChatgptSessionService.GetSessionByUserToken(ctx, userToken.String())
 	if err != nil {
 		g.Log().Error(ctx, err)
-		r.Response.WriteStatus(http.StatusUnauthorized)
+		r.Session.RemoveAll()
+		r.Response.WriteJson(g.Map{})
 		return
 	}
 	if record.IsEmpty() {
@@ -49,17 +50,21 @@ func Session(r *ghttp.Request) {
 
 		r.Response.WriteJsonExit(sessionJson)
 	} else {
+
 		sessionJson := gjson.New(record["officialSession"].String())
-		getSessionUrl := config.CHATPROXY(ctx) + "/auth/token"
+		getSessionUrl := config.CHATPROXY(ctx) + "/getsession"
+		refreshCookie := sessionJson.Get("refreshCookie").String()
+
 		expires := sessionJson.Get("expires").Time()
 
 		// 判断是否过期
 		if expires.Before(time.Now()) {
 			g.Log().Info(ctx, "session 过期，重新获取")
 			sessionVar := g.Client().SetHeader("authkey", config.AUTHKEY(ctx)).PostVar(ctx, getSessionUrl, g.Map{
-				"username": record["email"].String(),
-				"password": record["password"].String(),
-				"authkey":  config.AUTHKEY(ctx),
+				"username":      record["email"].String(),
+				"password":      record["password"].String(),
+				"authkey":       config.AUTHKEY(ctx),
+				"refreshCookie": refreshCookie,
 			})
 			sessionJson = gjson.New(sessionVar)
 			if sessionJson.Get("accessToken").String() == "" {

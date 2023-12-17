@@ -46,6 +46,7 @@ func ProxyAll(r *ghttp.Request) {
 
 	ctx := r.GetCtx()
 	// 获取header中的token Authorization: Bearer xxx 去掉Bearer
+
 	userToken := r.Header.Get("Authorization")[7:]
 	isStream := strings.Contains(r.Header.Get("accept"), "text/event-stream")
 
