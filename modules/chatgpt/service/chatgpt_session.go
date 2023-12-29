@@ -50,7 +50,8 @@ func (s *ChatgptSessionService) ModifyAfter(ctx g.Ctx, method string, param map[
 		return
 	}
 	//  如果是手工模式不用处理
-	if param["mode"] == 0 {
+	if param["mode"] != 0 {
+		g.Log().Debug(ctx, "手工模式不需要刷新")
 		return
 	}
 	officialSession := gjson.New(param["officialSession"])
