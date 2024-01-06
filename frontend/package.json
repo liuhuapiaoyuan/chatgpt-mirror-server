@@ -2,7 +2,7 @@
 	"name": "front-next",
 	"version": "5.12.3",
 	"scripts": {
-		"dev": "vite --host",
+		"dev": "vite --host 0.0.0.0",
 		"build": "vite build",
 		"serve": "vite preview",
 		"lint:prettier": "prettier --write --loglevel warn \"src/**/*.{js,json,tsx,css,less,scss,vue,html,md}\"",

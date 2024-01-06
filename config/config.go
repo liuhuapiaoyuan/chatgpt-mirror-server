@@ -31,7 +31,8 @@ var (
 	DefaultModel = "text-davinci-002-render-sha"
 	FreeModels   = garray.NewStrArray()
 	PlusModels   = garray.NewStrArray()
-	ArkoseUrl    = "https://tcr9i.closeai.biz/v2/"
+	ArkoseUrl    = "http://localhost:8000/v2/"
+	//	ArkoseUrl    = "https://tcr9i.closeai.biz/v2/"
 	BuildId      = "q1uPMR9VmRS6HPYxPKMbH"
 	CacheBuildId = "q1uPMR9VmRS6HPYxPKMbH"
 	AssetPrefix  = "https://oaistatic-cdn.closeai.biz"
