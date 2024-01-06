@@ -87,9 +87,12 @@ func ProxyAll(r *ghttp.Request) {
 		// 如果path 以 ‘backend-api/files’ startwith开头
 		isCreateConversation := strings.HasPrefix(path, "/backend-api/conversation/gen_title")
 		isShare := strings.HasPrefix(path, "/backend-api/share/creat")
+		isLoadModels := strings.HasPrefix(path, "/backend-api/models")
 
 		if isCreateConversation {
 			CreateConversation(ctx, userId, accessToken, r.UserAgent(), path)
+		} else if isLoadModels {
+			AttachGPT4Mobile(ctx, response)
 		} else if isShare {
 			originalBody, shouldReturn, returnValue := loadRespString(response)
 			if shouldReturn {
@@ -123,6 +126,32 @@ func ProxyAll(r *ghttp.Request) {
 
 	proxy.ServeHTTP(r.Response.Writer.RawWriter(), newreq)
 
+}
+
+// 处理models 增加gpt-4-mobile
+func AttachGPT4Mobile(ctx g.Ctx, response *http.Response) error {
+	// 提取 /backend-api/models
+	originalBody, shouldReturn, returnValue := loadRespString(response)
+	if shouldReturn {
+		return returnValue
+	}
+	modifiedBody := string(originalBody)
+	if strings.Contains(modifiedBody, "gpt-4") {
+		resJson := gjson.New(modifiedBody)
+		models := resJson.Get("models").Array()
+		newObject := gjson.New(`{"capabilities":{},"description":"Browsing, Advanced Data Analysis, and DALL·E are now built into GPT-4","enabled_tools":["tools","tools2"],"max_tokens":32767,"product_features":{"attachments":{"accepted_mime_types":["text/x-csharp","application/vnd.openxmlformats-officedocument.wordprocessingml.document","text/x-tex","text/x-typescript","text/plain","text/x-ruby","application/msword","text/x-php","text/x-c++","text/markdown","application/x-latext","text/x-c","text/javascript","text/html","application/vnd.openxmlformats-officedocument.presentationml.presentation","application/json","text/x-java","application/pdf","text/x-script.python","text/x-sh"],"can_accept_all_mime_types":true,"image_mime_types":["image/jpeg","image/webp","image/gif","image/png"],"type":"retrieval"}},"slug":"gpt-4-mobile","tags":["confidential","gpt4","plus"],"title":"GPT4 (Mobile)"}`)
+		models = append(models, newObject)
+		resJson.Set("models", models) 
+		modifiedBody = resJson.String()
+	}
+	// 将修改后的内容写回响应体
+	response.Body = io.NopCloser(bytes.NewBufferString(modifiedBody))
+	// 更新Content-Length
+	response.ContentLength = int64(len(modifiedBody))
+	response.Header.Set("Content-Length", strconv.Itoa(len(modifiedBody)))
+	// 删除Content-Encoding头部
+	response.Header.Del("Content-Encoding")
+	return nil
 }
 
 // 创建信息，接受参数 conversationId
