@@ -34,6 +34,7 @@ func init() {
 	// backendGroup.GET("/accounts/check/*any", accounts.Check)
 	backendGroup.GET("/me", Me)
 	backendGroup.GET("/conversations", Conversations)
+	backendGroup.GET("/prompt_library", Prompt_library)
 
 }
 
