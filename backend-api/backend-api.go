@@ -53,7 +53,7 @@ func ProxyAll(r *ghttp.Request) {
 	// g.Log().Debug(ctx, "ProxyAll", r.URL.Path, r.Header.Get("accept"), isStream)
 
 	domain := r.Host
-	userId, accessToken, err := ChatgptSessionService.GetAccessToken(ctx, userToken)
+	userId, chatgptId, accessToken, err := ChatgptSessionService.GetAccessToken(ctx, userToken)
 
 	if err != nil {
 		g.Log().Error(ctx, err)
@@ -90,7 +90,7 @@ func ProxyAll(r *ghttp.Request) {
 		isLoadModels := strings.HasPrefix(path, "/backend-api/models")
 
 		if isCreateConversation {
-			CreateConversation(ctx, userId, accessToken, r.UserAgent(), path)
+			CreateConversation(ctx, userId, chatgptId, accessToken, r.UserAgent(), path)
 		} else if isLoadModels {
 			AttachGPT4Mobile(ctx, response)
 		} else if isShare {
@@ -141,7 +141,7 @@ func AttachGPT4Mobile(ctx g.Ctx, response *http.Response) error {
 		models := resJson.Get("models").Array()
 		newObject := gjson.New(`{"capabilities":{},"description":"Browsing, Advanced Data Analysis, and DALL·E are now built into GPT-4","enabled_tools":["tools","tools2"],"max_tokens":32767,"product_features":{"attachments":{"accepted_mime_types":["text/x-csharp","application/vnd.openxmlformats-officedocument.wordprocessingml.document","text/x-tex","text/x-typescript","text/plain","text/x-ruby","application/msword","text/x-php","text/x-c++","text/markdown","application/x-latext","text/x-c","text/javascript","text/html","application/vnd.openxmlformats-officedocument.presentationml.presentation","application/json","text/x-java","application/pdf","text/x-script.python","text/x-sh"],"can_accept_all_mime_types":true,"image_mime_types":["image/jpeg","image/webp","image/gif","image/png"],"type":"retrieval"}},"slug":"gpt-4-mobile","tags":["confidential","gpt4","plus"],"title":"GPT4 (Mobile)"}`)
 		models = append(models, newObject)
-		resJson.Set("models", models) 
+		resJson.Set("models", models)
 		modifiedBody = resJson.String()
 	}
 	// 将修改后的内容写回响应体
@@ -155,7 +155,7 @@ func AttachGPT4Mobile(ctx g.Ctx, response *http.Response) error {
 }
 
 // 创建信息，接受参数 conversationId
-func CreateConversation(ctx g.Ctx, userId int, AccessToken string, userAgent string, conversationPath string) {
+func CreateConversation(ctx g.Ctx, userId int, chatgptId int, AccessToken string, userAgent string, conversationPath string) {
 	// 提取 /backend-api/conversation/gen_title/{id}
 	id := strings.Split(conversationPath, "/")[4]
 	g.Log().Info(ctx, "提取出的ID", id)
@@ -179,6 +179,8 @@ func CreateConversation(ctx g.Ctx, userId int, AccessToken string, userAgent str
 	history.CreateTime = resJson.Get("create_time").Time()
 	history.UpdateTime = resJson.Get("update_time").Time()
 	history.ConversationId = resJson.Get("conversation_id").String()
+	// 账号ID
+	history.ChatgptId = chatgptId
 
 	conversationTemplateId := resJson.Get("conversation_template_id").String()
 	if conversationTemplateId != "" {
@@ -188,6 +190,7 @@ func CreateConversation(ctx g.Ctx, userId int, AccessToken string, userAgent str
 	if gizmo_id != "" {
 		history.GizmoId = gizmo_id
 	}
+
 	cool.DBM(model.NewChatgptHistory()).InsertAndGetId(history)
 }
 

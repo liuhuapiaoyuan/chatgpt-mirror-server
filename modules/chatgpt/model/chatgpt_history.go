@@ -12,6 +12,7 @@ type ChatgptHistory struct {
 	UserId                  int    `gorm:"column:user_id;not null;comment:用户ID" json:"userId"`
 	Title                   string `gorm:"column:title;not null;comment:标题" json:"title"`
 	ConversationId          string `gorm:"column:conversation_id;not null;unique;comment:会话ID" json:"conversationId"`
+	ChatgptId               int    `gorm:"column:chatgpt_id;comment:CHATGPT账号ID" json:"chatgptId"`
 	ConversationTemplate_id string `gorm:"column:conversation_template_id;comment:模板ID" json:"conversationTemplateId"`
 	GizmoId                 string `gorm:"column:gizmo_id;comment:工具ID" json:"gizmoId"`
 }

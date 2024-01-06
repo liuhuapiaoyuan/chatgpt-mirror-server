@@ -116,14 +116,15 @@ func (s *ChatgptSessionService) GetSessionByUserToken(ctx g.Ctx, userToken strin
 	return
 }
 
-// 统一封装token的获取
-func (s *ChatgptSessionService) GetAccessToken(ctx g.Ctx, userToken string) (userId int, accessToken string, err2 error) {
+// 获得账号信息
+func (s *ChatgptSessionService) GetAccessToken(ctx g.Ctx, userToken string) (userId int, chatgptId int, accessToken string, err2 error) {
 	user, err2 := cool.DBM(model.NewChatgptUser()).Where("userToken", userToken).One()
 	if err2 != nil {
 		g.Log().Error(ctx, err2)
 		return
 	}
 	userId = user["id"].Int()
+	chatgptId = user["sessionId"].Int()
 
 	officialAccessToken := AccessTokenCache.MustGet(ctx, userToken).String()
 	if officialAccessToken == "" {
