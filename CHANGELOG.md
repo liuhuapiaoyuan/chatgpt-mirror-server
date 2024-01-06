@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.1.0](https://github.com/liuhuapiaoyuan/chatgpt-mirror-server/compare/v1.0.0...v1.1.0) (2024-01-06)
+
+
+### Features
+
+* 由于独立计费，所以增加gpt4-mobile ([6b70eb4](https://github.com/liuhuapiaoyuan/chatgpt-mirror-server/commit/6b70eb4cf4b0b1a99d4e0bd1b938641af8613ba3))
+
+
+### Bug Fixes
+
+* 修复Prompt的错误，同时汉化 ([7b63e30](https://github.com/liuhuapiaoyuan/chatgpt-mirror-server/commit/7b63e30ffd3d4ab9b100011f68dee56979287b02))
+* 修复自动登录的问题 ([2fa28f7](https://github.com/liuhuapiaoyuan/chatgpt-mirror-server/commit/2fa28f70a6de71a953e74db0d817801d128183cb))
+* 修补部分接口未对接造成的异常 ([48a289d](https://github.com/liuhuapiaoyuan/chatgpt-mirror-server/commit/48a289d2a8a84fc71141027e9e57ad31df0f8e19))
+* 删除无用的next ([42f6f65](https://github.com/liuhuapiaoyuan/chatgpt-mirror-server/commit/42f6f6579b1ccd67ed13c323198b3592fde31b30))
+* 增加授权码，增加开发使用的网关 ([d397396](https://github.com/liuhuapiaoyuan/chatgpt-mirror-server/commit/d3973966d90338d8979e6e8cd28d3ad2ff1951ca))
+* 引入账号关联会话机制，切换账号等于切换聊天记录 ([62002b3](https://github.com/liuhuapiaoyuan/chatgpt-mirror-server/commit/62002b3f4a6bc4896f51debd31fa0ba97278b86d))
+* 测试prompt ([b9ab10a](https://github.com/liuhuapiaoyuan/chatgpt-mirror-server/commit/b9ab10a46d9d2495b2e6d308b9e191e911439f77))
+* 调整会话ID的唯一 ([7d14825](https://github.com/liuhuapiaoyuan/chatgpt-mirror-server/commit/7d148252c41dc278203d2b3e7f2a30a55e6281e2))
+* 调整部分细节代码 ([7ab3246](https://github.com/liuhuapiaoyuan/chatgpt-mirror-server/commit/7ab32464b760f3793b83df5076f11e25122a0d27))
+* 还原配置 ([0583439](https://github.com/liuhuapiaoyuan/chatgpt-mirror-server/commit/0583439665dae4f5447dd6db6af6e8df3aae6bd4))
+
 ## 1.0.0 (2023-12-05)
 
 
