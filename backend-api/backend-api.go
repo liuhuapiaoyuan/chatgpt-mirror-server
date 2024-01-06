@@ -28,6 +28,7 @@ var (
 func init() {
 	s := g.Server()
 	s.BindHandler("/backend-api/*any", ProxyAll)
+	s.BindHandler("/_next/data/*any", NextDataGptsFixed)
 	backendGroup := s.Group("/backend-api")
 	backendGroup.POST("/accounts/data_export", NotFound) // 禁用导出
 	backendGroup.POST("/payments/checkout", NotFound)    // 禁用支付
@@ -35,6 +36,7 @@ func init() {
 	backendGroup.GET("/me", Me)
 	backendGroup.GET("/conversations", Conversations)
 	backendGroup.GET("/prompt_library", Prompt_library)
+	backendGroup.GET("/upgrade_invites", NextDataGptsFixed)
 
 }
 
