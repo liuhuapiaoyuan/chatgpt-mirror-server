@@ -55,11 +55,10 @@ modules:
         enable: 1
 
 # 接入网关地址
-CHATPROXY:  "https://chatgpt1.ggss.club"
-ARKOSE_URL: "https://chatgpt1.ggss.club/v2/"
-# CHATPROXY: "http://172.17.0.1:7009"
+CHATPROXY:  "https://chatgpt.ggss.club/gateway"
+ARKOSE_URL: "https://chatgpt.ggss.club/arkose/v2/"
 # 接入网关的authkey
-AUTHKEY: "xyhelper"
+AUTHKEY: "maidou"
 ONLYTOKEN: false
 CDNHOST: "https://file.chatgpt.ggss.club"
 ASSET_PREFIX: "https://cdn.chatgpt.ggss.club"
