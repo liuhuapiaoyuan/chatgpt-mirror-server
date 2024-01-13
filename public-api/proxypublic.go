@@ -22,6 +22,8 @@ func ProxyPublic(r *ghttp.Request) {
 	newreq.URL.Host = u.Host
 	newreq.URL.Scheme = u.Scheme
 	newreq.Host = u.Host
+	newreq.Header.Set("authkey", config.AUTHKEY(ctx))
+
 	// newreq.Header.Set("Cookie", "__Secure-next-auth.session-token="+carinfo.RefreshCookie)
 	// // 去除header 中的 压缩
 	// newreq.Header.Del("Accept-Encoding")

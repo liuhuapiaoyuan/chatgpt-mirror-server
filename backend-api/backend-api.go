@@ -28,7 +28,7 @@ var (
 func init() {
 	s := g.Server()
 	s.BindHandler("/backend-api/*any", ProxyAll)
-	s.BindHandler("/public-api/*any", ProxyAll)
+	// s.BindHandler("/public-api/*any", ProxyAll)
 	//	s.BindHandler("/_next/data/*any", NextDataGptsFixed)
 	backendGroup := s.Group("/backend-api")
 	backendGroup.POST("/accounts/data_export", NotFound) // 禁用导出

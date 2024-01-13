@@ -40,6 +40,7 @@ func Me(r *ghttp.Request) {
 	res, err := g.Client().SetHeaderMap(map[string]string{
 		"Authorization": "Bearer " + AccessToken,
 		"User-Agent":    r.Header.Get("User-Agent"),
+		"authKey":       config.AUTHKEY(ctx),
 	}).Get(ctx, UpStream+"/backend-api/me")
 	if err != nil {
 		r.Response.WriteStatus(http.StatusUnauthorized)
