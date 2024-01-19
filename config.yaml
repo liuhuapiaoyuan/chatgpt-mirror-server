@@ -55,7 +55,7 @@ modules:
         enable: 1
 
 # 接入网关地址
-CHATPROXY:  "https://chatgpt.ggss.club/gateway"
+CHATPROXY: "https://chatgpt.ggss.club/gateway"
 ARKOSE_URL: "https://chatgpt.ggss.club/arkose/v2/"
 # 接入网关的authkey
 AUTHKEY: "maidou"

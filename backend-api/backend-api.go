@@ -28,7 +28,8 @@ var (
 func init() {
 	s := g.Server()
 	s.BindHandler("/backend-api/*any", ProxyAll)
-	s.BindHandler("/_next/data/*any", NextDataGptsFixed)
+	// s.BindHandler("/public-api/*any", ProxyAll)
+	//	s.BindHandler("/_next/data/*any", NextDataGptsFixed)
 	backendGroup := s.Group("/backend-api")
 	backendGroup.POST("/accounts/data_export", NotFound) // 禁用导出
 	backendGroup.POST("/payments/checkout", NotFound)    // 禁用支付
@@ -49,8 +50,13 @@ func ProxyAll(r *ghttp.Request) {
 
 	ctx := r.GetCtx()
 	// 获取header中的token Authorization: Bearer xxx 去掉Bearer
+	userToken := ""
+	Authorization := r.Header.Get("Authorization")
+	if Authorization != "" {
+		userToken = r.Header.Get("Authorization")[7:]
+	}
+	g.Log().Debug(ctx, "userToken", userToken)
 
-	userToken := r.Header.Get("Authorization")[7:]
 	isStream := strings.Contains(r.Header.Get("accept"), "text/event-stream")
 	// 获得当前的请求域名
 	// g.Log().Debug(ctx, "ProxyAll", r.URL.Path, r.Header.Get("accept"), isStream)
@@ -78,10 +84,12 @@ func ProxyAll(r *ghttp.Request) {
 	newreq.URL.Scheme = u.Scheme
 	newreq.Host = u.Host
 	newreq.Header.Set("authkey", config.AUTHKEY(ctx))
-	newreq.Header.Set("Authorization", "Bearer "+accessToken)
 
 	newreq.Header.Set("Host", "chat.openai.com")
 	newreq.Header.Set("Origin", "https://chat.openai.com/chat")
+	if accessToken != "" {
+		newreq.Header.Set("Authorization", "Bearer "+accessToken)
+	}
 
 	// g.Dump(newreq.URL)
 	cdnhost := config.CDNHOST(ctx)
