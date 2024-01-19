@@ -10,22 +10,27 @@
       "source": "dind-var-lib-docker-${devcontainerId}",
       "target": "/var/lib/docker",
       "type": "volume"
+    },
+    {
+      "source": "node_modules_volume",
+      "target": "/latestworkspaces/chatgpt-mirror-server/frontend/node_modules",
+      "type": "volume"
     }
   ],
   "customizations": {
     "vscode": {
       "extensions": [
         "ms-ceintl.vscode-language-pack-zh-hans",
-        "GitHub.vscode-pull-request-github",
-        "github.copilot",
         "esbenp.prettier-vscode",
         "vue.volar",
-        "cweijan.vscode-database-client2"
+        "sourcegraph.cody-ai"
       ]
     }
   },
   "containerEnv": {
-    "TZ": "Asia/Shanghai"
+    "TZ": "Asia/Shanghai",
+    "HTTP_PROXY":"",
+    "HTTPS_PROXY":""
   },
   "postCreateCommand": "make init",
   "remoteUser": "root"

@@ -33,6 +33,8 @@ services:
       TZ: Asia/Shanghai # 指定时区
       # 接入网关地址
       CHATPROXY: "https://demo.xyhelper.cn"
+      # 增加环境变量的配置
+      ASSET_PREFIX: ""
       # 接入网关的authkey
       AUTHKEY: "xyhelper"
       # 是否只使用token验证

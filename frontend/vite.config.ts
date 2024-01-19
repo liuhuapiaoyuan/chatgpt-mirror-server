@@ -15,8 +15,6 @@ function resolve(dir: string) {
 
 export default (): UserConfig => {
 	return {
-		host: true, // Here
-  		strictPort: true,
 		base: "/xyhelper/",
 		plugins: [
 			vue(),
@@ -46,8 +44,13 @@ export default (): UserConfig => {
 		server: {
 			port: 9000,
 			proxy,
+			origin: "http://127.0.0.1:9000",
+			strictPort: true,
 			hmr: {
 				overlay: true
+			},
+			watch: {
+				usePolling: true
 			}
 		},
 		build: {

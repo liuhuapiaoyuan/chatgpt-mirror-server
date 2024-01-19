@@ -12,6 +12,7 @@ import (
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gcache"
+	"github.com/gogf/gf/v2/util/gconv"
 )
 
 type ChatgptSessionService struct {
@@ -49,36 +50,44 @@ func (s *ChatgptSessionService) ModifyAfter(ctx g.Ctx, method string, param map[
 		return
 	}
 	//  如果是手工模式不用处理
-	if param["mode"] == 0 {
+	if param["mode"] != 0 {
+		g.Log().Debug(ctx, "手工模式不需要刷新")
 		return
 	}
-
+	officialSession := gjson.New(param["officialSession"])
+	refreshCookie := officialSession.Get("refreshCookie").String()
 	// 如果没有officialSession，就去获取
-	if param["officialSession"] == "" || param["officialSession"] == nil {
-		g.Log().Debug(ctx, "ChatgptSessionService.ModifyAfter", "officialSession is empty")
-		getSessionUrl := config.CHATPROXY(ctx) + "/getsession"
-		sessionVar := g.Client().SetHeader("authkey", config.AUTHKEY(ctx)).PostVar(ctx, getSessionUrl, g.Map{
-			"username": param["email"],
-			"password": param["password"],
-			"authkey":  config.AUTHKEY(ctx),
-		})
-		sessionJson := gjson.New(sessionVar)
-		if sessionJson.Get("accessToken").String() == "" {
-			g.Log().Error(ctx, "ChatgptSessionService.ModifyAfter", "get session error", sessionJson)
-			detail := sessionJson.Get("detail").String()
-			if detail != "" {
-				err = gerror.New(detail)
-			} else {
-				err = gerror.New("get session error")
-			}
-			return
+	g.Log().Debug(ctx, "ChatgptSessionService.ModifyAfter", "officialSession is empty")
+	getSessionUrl := config.CHATPROXY(ctx) + "/getsession"
+	sessionVar := g.Client().SetHeader("authkey", config.AUTHKEY(ctx)).SetCookie("arkoseToken", gconv.String(param["arkoseToken"])).PostVar(ctx, getSessionUrl, g.Map{
+		"username":      param["email"],
+		"password":      param["password"],
+		"authkey":       config.AUTHKEY(ctx),
+		"refreshCookie": refreshCookie,
+	})
+	sessionJson := gjson.New(sessionVar)
+	if sessionJson.Get("accessToken").String() == "" {
+		g.Log().Error(ctx, "ChatgptSessionService.ModifyAfter", "get session error", sessionJson)
+		detail := sessionJson.Get("detail").String()
+		if detail != "" {
+			err = gerror.New(detail)
+			cool.DBM(s.Model).Where("email=?", param["email"]).Update(g.Map{
+				"officialSession": sessionJson.String(),
+				"status":          0,
+			})
+		} else {
+			err = gerror.New("get session error")
 		}
-		_, err = cool.DBM(s.Model).Where("email=?", param["email"]).Update(g.Map{
-			"officialSession": sessionJson.String(),
-		})
 		return
 	}
+	models := sessionJson.Get("models").Array()
+	_, err = cool.DBM(s.Model).Where("email=?", param["email"]).Update(g.Map{
+		"officialSession": sessionJson.String(),
+		"isPlus":          len(models) > 1,
+		"status":          1,
+	})
 	return
+
 }
 
 // GetSessionByUserToken 根据userToken获取session
@@ -107,14 +116,15 @@ func (s *ChatgptSessionService) GetSessionByUserToken(ctx g.Ctx, userToken strin
 	return
 }
 
-// 统一封装token的获取
-func (s *ChatgptSessionService) GetAccessToken(ctx g.Ctx, userToken string) (userId int, accessToken string, err2 error) {
+// 获得账号信息
+func (s *ChatgptSessionService) GetAccessToken(ctx g.Ctx, userToken string) (userId int, chatgptId int, accessToken string, err2 error) {
 	user, err2 := cool.DBM(model.NewChatgptUser()).Where("userToken", userToken).One()
 	if err2 != nil {
 		g.Log().Error(ctx, err2)
 		return
 	}
 	userId = user["id"].Int()
+	chatgptId = user["sessionId"].Int()
 
 	officialAccessToken := AccessTokenCache.MustGet(ctx, userToken).String()
 	if officialAccessToken == "" {

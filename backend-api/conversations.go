@@ -21,6 +21,7 @@ func Conversations(r *ghttp.Request) {
 		return
 	}
 	userId := user["id"].Int()
+	chatgptId := user["sessionId"].Int()
 	if !user["isIsolate"].Bool() {
 		ProxyAll(r)
 		return
@@ -31,13 +32,13 @@ func Conversations(r *ghttp.Request) {
 	limit := r.GetQuery("limit").Int()
 	order := "updateTime desc"
 
-	list, err := cool.DBM(model.NewChatgptHistory()).Where("user_id=?", userId).Order(order).Limit(offset, limit).All()
+	list, err := cool.DBM(model.NewChatgptHistory()).Where("user_id=?", userId).Where("chatgpt_id", chatgptId).Order(order).Limit(offset, limit).All()
 	if err != nil {
 		g.Log().Error(ctx, err)
 		r.Response.WriteStatus(http.StatusUnauthorized)
 		return
 	}
-	total, err := cool.DBM(model.NewChatgptHistory()).Where("user_id=?", userId).Order(order).Count()
+	total, err := cool.DBM(model.NewChatgptHistory()).Where("user_id=?", userId).Where("chatgpt_id", chatgptId).Order(order).Count()
 	if err != nil {
 		g.Log().Error(ctx, err)
 		r.Response.WriteStatus(http.StatusUnauthorized)

@@ -1,4 +1,4 @@
 {
-    "registry-mirrors": [
-        ]
+  "registry-mirrors": [],
+  "dns": ["114.114.114.114", "8.8.8.8"]
 }

@@ -1,13 +1,12 @@
 server:
   serverRoot: "resource/public"
-  clientMaxBodySize: 104857600  # 100MB in bytes 100*1024*1024
+  clientMaxBodySize: 104857600 # 100MB in bytes 100*1024*1024
 
 logger:
   path: "./data/logs/"
   file: "{Y-m-d}.log"
-  level : "all"
+  level: "all"
   stdout: true
-
 
 database:
   # default:
@@ -33,7 +32,7 @@ redis:
   cool:
     address: "127.0.0.1:6379"
     db: 0
-    
+
 cool:
   autoMigrate: true
   eps: true
@@ -57,9 +56,10 @@ modules:
 
 # 接入网关地址
 CHATPROXY: "http://host.docker.internal:7999"
+ARKOSE_URL: "https://chatgpt.ggss.club/arkose/v2/"
 # 接入网关的authkey
-AUTHKEY: "xyhelper"
+AUTHKEY: "maidou"
 ONLYTOKEN: false
 CDNHOST: "https://file.chatgpt.ggss.club"
-
+ASSET_PREFIX: "https://cdn.chatgpt.ggss.club"
 # 5a07e29c-31d8-4976-ba66-f183598587d9

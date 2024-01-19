@@ -10,7 +10,9 @@ import (
 
 func Index(r *ghttp.Request) {
 
-	if r.Session.MustGet("userToken").IsEmpty() {
+	ctx := r.GetCtx()
+	if r.Session.MustGet("offical-session").IsEmpty() {
+		r.Session.RemoveAll()
 		r.Response.RedirectTo("/login")
 		// r.Response.Writer.Write([]byte("Hello XyHelper"))
 		return
@@ -55,23 +57,29 @@ func Index(r *ghttp.Request) {
 }`
 
 	propsJson := gjson.New(props)
-	propsJson.Set("query.model", model)
+	if model != "" {
+		propsJson.Set("query.model", model)
+	}
 	propsJson.Set("buildId", config.BuildId)
+	propsJson.Set("assetPrefix", config.AssetPrefix)
 
-	r.Response.WriteTpl("chat-"+config.BuildDate+".html", g.Map{
-		"props":     propsJson,
-		"arkoseUrl": config.ArkoseUrl,
+	r.Response.WriteTpl(config.CacheBuildId+"/chat.html", g.Map{
+		"props":       propsJson,
+		"arkoseUrl":   config.ArkoseUrl,
+		"assetPrefix": config.AssetPrefix,
+		"envScript":   config.GetEnvScript(ctx),
 	})
 }
 func C(r *ghttp.Request) {
-
-	if r.Session.MustGet("userToken").IsEmpty() {
+	ctx := r.GetCtx()
+	if r.Session.MustGet("offical-session").IsEmpty() {
+		r.Session.RemoveAll()
 		r.Response.RedirectTo("/login")
 		return
 	}
-	chatId := r.RequestURI[3:]
+	convId := r.GetRouter("convId").String()
 
-	g.Log().Debug(r.GetCtx(), "chatId", chatId)
+	g.Log().Debug(r.GetCtx(), "convId", convId)
 	props := `
   {
     "props": {
@@ -106,19 +114,78 @@ func C(r *ghttp.Request) {
     "scriptLoader": []
   }
 	`
+
 	propsJson := gjson.New(props)
-	propsJson.Set("query.default.1", chatId)
+	propsJson.Set("query.default.1", convId)
 	propsJson.Set("buildId", config.BuildId)
-	r.Response.WriteTpl("chat-"+config.BuildDate+".html", g.Map{
-		"props":     propsJson,
-		"arkoseUrl": config.ArkoseUrl,
+	propsJson.Set("assetPrefix", config.AssetPrefix)
+
+	r.Response.WriteTpl(config.CacheBuildId+"/chat.html", g.Map{
+		"props":       propsJson,
+		"arkoseUrl":   config.ArkoseUrl,
+		"assetPrefix": config.AssetPrefix,
+		"envScript":   config.GetEnvScript(ctx),
+	})
+}
+
+// Gpts
+func Gpts(r *ghttp.Request) {
+
+	if r.Session.MustGet("offical-session").IsEmpty() {
+		r.Session.RemoveAll()
+		r.Response.RedirectTo("/login")
+		return
+	}
+	props := `
+  {
+    "props": {
+      "pageProps": {
+        "user": {
+          "id": "user-xyhelper",
+          "name": "admin@openai.com",
+          "email": "admin@openai.com",
+          "image": "/avatars.png",
+          "picture": "/avatars.png",
+          "idp": "auth0",
+          "iat": 2699699364,
+          "mfa": false,
+          "groups": []
+        },
+        "serviceStatus": {},
+        "userCountry": "US",
+        "serviceAnnouncement": { "public": {}, "paid": {} },
+        "serverPrimedAllowBrowserStorageValue": true,
+        "canManageBrowserStorage": false,
+        "ageVerificationDeadline": null,
+        "showCookieConsentBanner": false
+      },
+      "__N_SSP": true
+    },
+    "page": "/gpts",
+    "query": {},
+    "buildId": "wtXFegAXt6bfbujLr1e7S",
+    "assetPrefix": "",
+    "isFallback": false,
+    "gssp": true,
+    "scriptLoader": []
+  }
+  `
+	propsJson := gjson.New(props)
+	propsJson.Set("buildId", config.BuildId)
+
+	r.Response.WriteTpl(config.CacheBuildId+"/gpts.html", g.Map{
+		"arkoseUrl":   config.ArkoseUrl,
+		"props":       propsJson,
+		"assetPrefix": config.AssetPrefix,
+		"envScript":   config.GetEnvScript(r.GetCtx()),
 	})
 }
 
 // Discovery 发现
 func Discovery(r *ghttp.Request) {
 
-	if r.Session.MustGet("userToken").IsEmpty() {
+	if r.Session.MustGet("offical-session").IsEmpty() {
+		r.Session.RemoveAll()
 		r.Response.RedirectTo("/login")
 		return
 	}
@@ -159,16 +226,19 @@ func Discovery(r *ghttp.Request) {
 	propsJson := gjson.New(props)
 	propsJson.Set("buildId", config.BuildId)
 
-	r.Response.WriteTpl("discovery-"+config.BuildDate+".html", g.Map{
-		"arkoseUrl": config.ArkoseUrl,
-		"props":     propsJson,
+	r.Response.WriteTpl(config.CacheBuildId+"/discovery.html", g.Map{
+		"arkoseUrl":   config.ArkoseUrl,
+		"props":       propsJson,
+		"assetPrefix": config.AssetPrefix,
+		"envScript":   config.GetEnvScript(r.GetCtx()),
 	})
 }
 
 // Editor 编辑器
 func Editor(r *ghttp.Request) {
 
-	if r.Session.MustGet("userToken").IsEmpty() {
+	if r.Session.MustGet("offical-session").IsEmpty() {
+		r.Session.RemoveAll()
 		r.Response.RedirectTo("/login")
 		return
 	}
@@ -209,6 +279,7 @@ func Editor(r *ghttp.Request) {
   `
 	propsJson := gjson.New(props)
 	propsJson.Set("buildId", config.BuildId)
+	propsJson.Set("assetPrefix", config.AssetPrefix)
 
 	// if slug != "" {
 	// 	propsJson.Set("page", "/gpts/editor/[slug]")
@@ -216,16 +287,19 @@ func Editor(r *ghttp.Request) {
 	// }
 	// propsJson.Dump()
 
-	r.Response.WriteTpl("editor-"+config.BuildDate+".html", g.Map{
-		"arkoseUrl": config.ArkoseUrl,
-		"props":     propsJson,
+	r.Response.WriteTpl(config.CacheBuildId+"/editor.html", g.Map{
+		"arkoseUrl":   config.ArkoseUrl,
+		"props":       propsJson,
+		"assetPrefix": config.AssetPrefix,
+		"envScript":   config.GetEnvScript(r.GetCtx()),
 	})
 }
 
 // Slug 编辑器
 func Slug(r *ghttp.Request) {
 
-	if r.Session.MustGet("userToken").IsEmpty() {
+	if r.Session.MustGet("offical-session").IsEmpty() {
+		r.Session.RemoveAll()
 		r.Response.RedirectTo("/login")
 		return
 	}
@@ -269,16 +343,21 @@ func Slug(r *ghttp.Request) {
 
 	propsJson.Set("query.slug", slug)
 	propsJson.Set("buildId", config.BuildId)
-	r.Response.WriteTpl("slug-"+config.BuildDate+".html", g.Map{
-		"arkoseUrl": config.ArkoseUrl,
-		"props":     propsJson,
+	propsJson.Set("assetPrefix", config.AssetPrefix)
+
+	r.Response.WriteTpl(config.CacheBuildId+"/slug.html", g.Map{
+		"arkoseUrl":   config.ArkoseUrl,
+		"props":       propsJson,
+		"assetPrefix": config.AssetPrefix,
+		"envScript":   config.GetEnvScript(r.GetCtx()),
 	})
 }
 
 // G 游戏
 func G(r *ghttp.Request) {
 
-	if r.Session.MustGet("userToken").IsEmpty() {
+	if r.Session.MustGet("offical-session").IsEmpty() {
+		r.Session.RemoveAll()
 		r.Response.RedirectTo("/login")
 		return
 	}
@@ -322,17 +401,21 @@ func G(r *ghttp.Request) {
 	propsJson := gjson.New(props)
 	propsJson.Set("query.gizmoId", gizmoId)
 	propsJson.Set("buildId", config.BuildId)
+	propsJson.Set("assetPrefix", config.AssetPrefix)
 
-	r.Response.WriteTpl("g-"+config.BuildDate+".html", g.Map{
-		"arkoseUrl": config.ArkoseUrl,
-		"props":     propsJson,
+	r.Response.WriteTpl(config.CacheBuildId+"/g.html", g.Map{
+		"arkoseUrl":   config.ArkoseUrl,
+		"props":       propsJson,
+		"assetPrefix": config.AssetPrefix,
+		"envScript":   config.GetEnvScript(r.GetCtx()),
 	})
 }
 
 // GC 游戏会话
 func GC(r *ghttp.Request) {
 
-	if r.Session.MustGet("userToken").IsEmpty() {
+	if r.Session.MustGet("offical-session").IsEmpty() {
+		r.Session.RemoveAll()
 		r.Response.RedirectTo("/login")
 		return
 	}
@@ -381,8 +464,67 @@ func GC(r *ghttp.Request) {
 	propsJson.Set("query.convId", convId)
 	propsJson.Set("buildId", config.BuildId)
 
-	r.Response.WriteTpl("gc-"+config.BuildDate+".html", g.Map{
-		"arkoseUrl": config.ArkoseUrl,
-		"props":     propsJson,
+	r.Response.WriteTpl(config.CacheBuildId+"/gc.html", g.Map{
+		"arkoseUrl":   config.ArkoseUrl,
+		"props":       propsJson,
+		"assetPrefix": config.AssetPrefix,
+		"envScript":   config.GetEnvScript(r.GetCtx()),
 	})
+}
+
+// Mine 我的
+func Mine(r *ghttp.Request) {
+	if r.Session.MustGet("offical-session").IsEmpty() {
+		r.Session.RemoveAll()
+		r.Response.RedirectTo("/login")
+		return
+	}
+	props := `
+  {
+    "props": {
+        "pageProps": {
+            "user": {
+                "id": "user-xyhelper",
+                "name": "admin@openai.com",
+                "email": "admin@openai.com",
+                "image": "/avatars.png",
+                "picture": "/avatars.png",
+                "idp": "auth0",
+                "iat": 2699699364,
+                "mfa": false,
+                "groups": [],
+                "intercom_hash": "30fd0a0ada1c07ce526be7c3d54c22904b80fa7e2713d978630e979e4315cf67"
+            },
+            "serviceStatus": {},
+            "userCountry": "US",
+            "serviceAnnouncement": {
+                "paid": {},
+                "public": {}
+            },
+            "serverPrimedAllowBrowserStorageValue": true,
+            "canManageBrowserStorage": false,
+            "ageVerificationDeadline": null,
+            "showCookieConsentBanner": false
+        },
+        "__N_SSP": true
+    },
+    "page": "/gpts/mine",
+    "query": {},
+    "buildId": "wtXFegAXt6bfbujLr1e7S",
+    "assetPrefix": "",
+    "isFallback": false,
+    "gssp": true,
+    "scriptLoader": []
+}`
+	propsJson := gjson.New(props)
+	propsJson.Set("buildId", config.BuildId)
+	propsJson.Set("assetPrefix", config.AssetPrefix)
+
+	r.Response.WriteTpl(config.CacheBuildId+"/mine.html", g.Map{
+		"arkoseUrl":   config.ArkoseUrl,
+		"props":       propsJson,
+		"assetPrefix": config.AssetPrefix,
+		"envScript":   config.GetEnvScript(r.GetCtx()),
+	})
+
 }

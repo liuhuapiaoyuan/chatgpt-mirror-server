@@ -2,6 +2,7 @@ package api
 
 import (
 	"chatgpt-mirror-server/config"
+	"net/http"
 	"strings"
 
 	"github.com/cool-team-official/cool-admin-go/cool"
@@ -30,6 +31,12 @@ func Share(r *ghttp.Request) {
 		return
 	}
 	resStr := res.ReadAllString()
+	// 如果包含502
+	if strings.Contains(resStr, "502") {
+		r.Response.WriteStatus(http.StatusBadGateway)
+		return
+	}
+	g.Log().Debug(ctx, "share", resStr)
 
 	// 截取 <body class="antialiased"><div id="__next"> 后面的所有文本
 	infoContainerStr := "<div class=\"w-full pt-2 md:pt-0 dark:border-white/20 md:border-transparent md:dark:border-transparent md:w-[calc(100%-.5rem)]\">"
@@ -40,8 +47,11 @@ func Share(r *ghttp.Request) {
 	insertPos := strings.Index(bodyStr, infoContainerStr) + len(infoContainerStr)
 	bodyStr = bodyStr[:insertPos] + insertStr + bodyStr[insertPos:]
 
-	r.Response.WriteTpl("share-"+config.BuildDate+".html", g.Map{
-		"arkoseUrl": config.ArkoseUrl,
-		"content":   bodyStr,
+	// 暂时冻结share
+	r.Response.WriteTpl("/share-20231119.html", g.Map{
+		"arkoseUrl":   config.ArkoseUrl,
+		"assetPrefix": config.AssetPrefix,
+		"envScript":   config.GetEnvScript(ctx),
+		"content":     bodyStr,
 	})
 }

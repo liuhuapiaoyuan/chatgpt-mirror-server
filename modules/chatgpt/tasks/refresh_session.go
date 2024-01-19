@@ -38,12 +38,16 @@ func RefreshSession(ctx g.Ctx) {
 
 		getSessionUrl := config.CHATPROXY(ctx) + "/getsession"
 		refreshCookie := gjson.New(v["officialSession"]).Get("refreshCookie").String()
+		if refreshCookie == "" {
+			continue
+		}
 		sessionVar := g.Client().SetHeader("authkey", config.AUTHKEY(ctx)).PostVar(ctx, getSessionUrl, g.Map{
-			"username":      v["email"],
-			"password":      v["password"],
-			"authkey":       config.AUTHKEY(ctx),
-			"refreshCookie": refreshCookie,
+			"username": v["email"],
+			"password": v["password"],
+			"authkey":  config.AUTHKEY(ctx),
+			// "refreshCookie": refreshCookie,
 		})
+		g.Log().Info(ctx, "账号", v["email"], "sessionVar", sessionVar)
 		sessionJson := gjson.New(sessionVar)
 		if sessionJson.Get("accessToken").String() == "" {
 			g.Log().Error(ctx, "RefreshSession", v["email"], "get session error", sessionJson)

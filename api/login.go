@@ -56,7 +56,7 @@ func Login(r *ghttp.Request) {
 func LoginPost(r *ghttp.Request) {
 	ctx := r.GetCtx()
 	// 如果用户名为空，就是token登录
-	g.Log().Debug(ctx, "1232", r.Get("username").String() == "")
+	// g.Log().Debug(ctx, "1232", r.Get("username").String() == "")
 	if r.Get("username").String() == "" {
 		// token登录
 		userToken := r.Get("password").String()
@@ -76,6 +76,8 @@ func LoginPost(r *ghttp.Request) {
 			})
 			return
 		}
+		officialSession := record["officialSession"].String()
+		r.Session.Set("offical-session", officialSession)
 		r.Session.Set("userToken", userToken)
 		r.Response.RedirectTo("/")
 		return
@@ -148,6 +150,8 @@ func LoginPost(r *ghttp.Request) {
 		}
 	}
 
+	officialSession := record2["officialSession"].String()
+	r.Session.Set("offical-session", officialSession)
 	r.Session.Set("userToken", user["userToken"].String())
 	r.Response.RedirectTo("/")
 
@@ -180,6 +184,8 @@ func LoginToken(r *ghttp.Request) {
 		})
 		return
 	}
+	officialSession := record["officialSession"].String()
+	r.Session.Set("offical-session", officialSession)
 	r.Session.Set("userToken", r.Get("access_token").String())
 	r.Response.RedirectTo("/")
 }

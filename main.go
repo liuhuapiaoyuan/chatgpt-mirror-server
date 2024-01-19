@@ -10,6 +10,7 @@ import (
 	_ "chatgpt-mirror-server/api"
 	_ "chatgpt-mirror-server/backend-api"
 	_ "chatgpt-mirror-server/modules"
+	_ "chatgpt-mirror-server/public-api"
 
 	"github.com/gogf/gf/v2/os/gctx"
 
@@ -19,4 +20,9 @@ import (
 func main() {
 	// gres.Dump()
 	cmd.Main.Run(gctx.New())
+
+	// 打印一段话： 服务已经启动，请访问 http://127.0.0.1
+	fmt.Println("服务已经启动，请访问 http://127.0.0.1")
+
+
 }
