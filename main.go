@@ -19,4 +19,9 @@ import (
 func main() {
 	// gres.Dump()
 	cmd.Main.Run(gctx.New())
+
+	// 打印一段话： 服务已经启动，请访问 http://127.0.0.1
+	fmt.Println("服务已经启动，请访问 http://127.0.0.1")
+
+
 }
