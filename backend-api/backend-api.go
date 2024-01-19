@@ -118,7 +118,7 @@ func ProxyAll(r *ghttp.Request) {
 func CreateConversation(ctx g.Ctx, userId int, AccessToken string, userAgent string, conversationPath string) {
 	// 提取 /backend-api/conversation/gen_title/{id}
 	id := strings.Split(conversationPath, "/")[4]
-	g.Log().Info(ctx, "提取出的ID", id)
+	
 
 	UpStream := config.CHATPROXY(ctx)
 	// 请求后端接口
@@ -131,7 +131,6 @@ func CreateConversation(ctx g.Ctx, userId int, AccessToken string, userAgent str
 	}
 	resStr := res.ReadAllString()
 	resJson := gjson.New(resStr)
-	g.Log().Info(ctx, resJson)
 
 	history := model.NewChatgptHistory()
 	history.UserId = userId
