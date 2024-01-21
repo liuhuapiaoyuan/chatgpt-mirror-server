@@ -54,38 +54,37 @@ func (s *ChatgptSessionService) ModifyAfter(ctx g.Ctx, method string, param map[
 		g.Log().Debug(ctx, "手工模式不需要刷新")
 		return
 	}
-	officialSession := gjson.New(param["officialSession"])
-	refreshCookie := officialSession.Get("refreshCookie").String()
-	// 如果没有officialSession，就去获取
-	g.Log().Debug(ctx, "ChatgptSessionService.ModifyAfter", "officialSession is empty")
-	getSessionUrl := config.CHATPROXY(ctx) + "/getsession"
-	sessionVar := g.Client().SetHeader("authkey", config.AUTHKEY(ctx)).SetCookie("arkoseToken", gconv.String(param["arkoseToken"])).PostVar(ctx, getSessionUrl, g.Map{
-		"username":      param["email"],
-		"password":      param["password"],
-		"authkey":       config.AUTHKEY(ctx),
-		"refreshCookie": refreshCookie,
-	})
-	sessionJson := gjson.New(sessionVar)
-	if sessionJson.Get("accessToken").String() == "" {
-		g.Log().Error(ctx, "ChatgptSessionService.ModifyAfter", "get session error", sessionJson)
-		detail := sessionJson.Get("detail").String()
-		if detail != "" {
-			err = gerror.New(detail)
-			cool.DBM(s.Model).Where("email=?", param["email"]).Update(g.Map{
-				"officialSession": sessionJson.String(),
-				"status":          0,
-			})
-		} else {
-			err = gerror.New("get session error")
+	officialSession := param["officialSession"]
+	if officialSession == "" {
+		g.Log().Debug(ctx, "ChatgptSessionService.ModifyAfter", "officialSession is empty")
+		getSessionUrl := config.CHATPROXY(ctx) + "/getsession"
+		sessionVar := g.Client().SetHeader("authkey", config.AUTHKEY(ctx)).SetCookie("arkoseToken", gconv.String(param["arkoseToken"])).PostVar(ctx, getSessionUrl, g.Map{
+			"username": param["email"],
+			"password": param["password"],
+			"authkey":  config.AUTHKEY(ctx),
+		})
+		sessionJson := gjson.New(sessionVar)
+		if sessionJson.Get("accessToken").String() == "" {
+			g.Log().Error(ctx, "ChatgptSessionService.ModifyAfter", "get session error", sessionJson)
+			detail := sessionJson.Get("detail").String()
+			if detail != "" {
+				err = gerror.New(detail)
+				cool.DBM(s.Model).Where("email=?", param["email"]).Update(g.Map{
+					"officialSession": sessionJson.String(),
+					"status":          0,
+				})
+			} else {
+				err = gerror.New("get session error")
+			}
+			return
 		}
-		return
+		models := sessionJson.Get("models").Array()
+		_, err = cool.DBM(s.Model).Where("email=?", param["email"]).Update(g.Map{
+			"officialSession": sessionJson.String(),
+			"isPlus":          len(models) > 1,
+			"status":          1,
+		})
 	}
-	models := sessionJson.Get("models").Array()
-	_, err = cool.DBM(s.Model).Where("email=?", param["email"]).Update(g.Map{
-		"officialSession": sessionJson.String(),
-		"isPlus":          len(models) > 1,
-		"status":          1,
-	})
 	return
 
 }
