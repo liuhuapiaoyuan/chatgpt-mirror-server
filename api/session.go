@@ -50,15 +50,21 @@ func Session(r *ghttp.Request) {
 
 		r.Response.WriteJsonExit(sessionJson)
 	} else {
+		refreshFlag := false
+		refreshCookie := ""
+		sessionJson := gjson.New("{}")
+		if record["officialSession"].String() == "" {
+			refreshFlag = true
+		} else {
+			sessionJson := gjson.New(record["officialSession"].String())
+			refreshCookie = sessionJson.Get("refreshCookie").String()
+			expires := sessionJson.Get("expires").Time()
+			refreshFlag = expires.Before(time.Now())
+		}
 
-		sessionJson := gjson.New(record["officialSession"].String())
 		getSessionUrl := config.CHATPROXY(ctx) + "/getsession"
-		refreshCookie := sessionJson.Get("refreshCookie").String()
-
-		expires := sessionJson.Get("expires").Time()
-
 		// 判断是否过期
-		if expires.Before(time.Now()) {
+		if refreshFlag {
 			g.Log().Info(ctx, "session 过期，重新获取")
 			sessionVar := g.Client().SetHeader("authkey", config.AUTHKEY(ctx)).PostVar(ctx, getSessionUrl, g.Map{
 				"username":      record["email"].String(),

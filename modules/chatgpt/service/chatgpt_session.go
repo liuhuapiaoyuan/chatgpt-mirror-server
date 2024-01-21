@@ -90,6 +90,31 @@ func (s *ChatgptSessionService) ModifyAfter(ctx g.Ctx, method string, param map[
 
 }
 
+// 写一个函数 刷新数据
+func (s *ChatgptSessionService) RefreshSession(ctx g.Ctx, chatgpt_session gdb.Record) (err error) {
+	getSessionUrl := config.CHATPROXY(ctx) + "/getsession"
+	sessionVar := g.Client().SetHeader("authkey", config.AUTHKEY(ctx)).PostVar(ctx, getSessionUrl, g.Map{
+		"username": chatgpt_session["email"],
+		"password": chatgpt_session["password"],
+		"authkey":  config.AUTHKEY(ctx),
+	})
+	sessionJson := gjson.New(sessionVar)
+	models := sessionJson.Get("models").Array()
+	_, err = cool.DBM(s.Model).Where("email=?", chatgpt_session["email"]).Update(g.Map{
+		"officialSession": sessionJson.String(),
+		"isPlus":          len(models) > 1,
+		"status":          1,
+	})
+	chatgpt_session["officialSession"] = (g.NewVar(sessionJson.String()))
+	if err == nil {
+		g.Log().Info(ctx, "GPT账号登录成功", "邮箱：", chatgpt_session["email"])
+		return
+	}
+	g.Log().Error(ctx, err)
+	err = gerror.New("后台账号登录失败，检查登录日志")
+	return
+}
+
 // GetSessionByUserToken 根据userToken获取session
 func (s *ChatgptSessionService) GetSessionByUserToken(ctx g.Ctx, userToken string) (record gdb.Record, expireTime string, err error) {
 
@@ -110,6 +135,13 @@ func (s *ChatgptSessionService) GetSessionByUserToken(ctx g.Ctx, userToken strin
 	}
 	if record.IsEmpty() {
 		return nil, "", gerror.New("没有可用的ChatGpt账号,请联系管理员")
+	}
+
+	officialSession := record["officialSession"].String()
+	if officialSession == "" && record["mode"].Int() == 0 {
+		// 没有登录尝试登录
+		err = s.RefreshSession(ctx, record)
+
 	}
 
 	record["user_username"] = user["username"]

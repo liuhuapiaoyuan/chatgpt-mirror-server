@@ -77,6 +77,7 @@ func LoginPost(r *ghttp.Request) {
 			return
 		}
 		officialSession := record["officialSession"].String()
+
 		r.Session.Set("offical-session", officialSession)
 		r.Session.Set("userToken", userToken)
 		r.Response.RedirectTo("/")
@@ -149,8 +150,18 @@ func LoginPost(r *ghttp.Request) {
 			})
 		}
 	}
-
 	officialSession := record2["officialSession"].String()
+	if officialSession == "" && record2["mode"].Int() == 0 {
+		err = ChatgptSessionService.RefreshSession(ctx, record2)
+		officialSession = record2["officialSession"].String()
+		if err != nil {
+			r.Response.WriteTpl("login.html", g.Map{
+				"username": r.Get("username").String(),
+				"error":    "后台登录失败，请联系管理员检查日志",
+			})
+			return
+		}
+	}
 	r.Session.Set("offical-session", officialSession)
 	r.Session.Set("userToken", user["userToken"].String())
 	r.Response.RedirectTo("/")
