@@ -170,7 +170,6 @@ func AttachGPT4Mobile(ctx g.Ctx, response *http.Response) error {
 func CreateConversation(ctx g.Ctx, userId int, chatgptId int, AccessToken string, userAgent string, conversationPath string) {
 	// 提取 /backend-api/conversation/gen_title/{id}
 	id := strings.Split(conversationPath, "/")[4]
-	
 
 	UpStream := config.CHATPROXY(ctx)
 	// 请求后端接口
@@ -209,14 +208,14 @@ func CreateConversation(ctx g.Ctx, userId int, chatgptId int, AccessToken string
 func RemoveCreateConversation(ctx g.Ctx, response *http.Response, conversationPath string) {
 	g.Log().Debug(ctx, "RemoveCreateConversation", conversationPath)
 	id := strings.Split(conversationPath, "/")[3]
-	g.Log().Info(ctx, "提取出的ID", id)
+	g.Log().Debug(ctx, "提取出的ID", id)
 
 	originalBody, shouldReturn, err := loadRespString(response)
 	if err != nil || shouldReturn {
 		return
 	}
 	resJson := gjson.New(string(originalBody))
-	g.Log().Info(ctx, "conversation will removed", resJson)
+	g.Log().Debug(ctx, "conversation will removed", resJson)
 	if resJson.Get("success").Bool() {
 		cool.DBM(model.NewChatgptHistory()).Where("conversation_id", id).Delete()
 	}
