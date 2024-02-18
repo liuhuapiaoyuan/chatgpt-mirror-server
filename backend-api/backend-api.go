@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -59,6 +60,7 @@ func ProxyAll(r *ghttp.Request) {
 	g.Log().Debug(ctx, "userToken", userToken)
 
 	isStream := strings.Contains(r.Header.Get("accept"), "text/event-stream")
+
 	// 获得当前的请求域名
 	// g.Log().Debug(ctx, "ProxyAll", r.URL.Path, r.Header.Get("accept"), isStream)
 
@@ -100,7 +102,15 @@ func ProxyAll(r *ghttp.Request) {
 		isCreateConversation := strings.HasPrefix(path, "/backend-api/conversation/gen_title")
 		isShare := strings.HasPrefix(path, "/backend-api/share/creat")
 		isLoadModels := strings.HasPrefix(path, "/backend-api/models")
+		if strings.HasPrefix(path, "/backend-api/conversation") {
+			// log content-type
+			g.Log().Debug(ctx, "content-type", response.Header.Get("Content-Type"))
+		}
 
+		// 判断response的Cotnent-Type是否是json
+		if response.Header.Get("Content-Type") == "application/json" {
+			isStream = false
+		}
 		if isCreateConversation {
 			CreateConversation(ctx, userId, chatgptId, accessToken, r.UserAgent(), path)
 		} else if isLoadModels {
@@ -123,7 +133,30 @@ func ProxyAll(r *ghttp.Request) {
 			if shouldReturn {
 				return returnValue
 			}
-			modifiedBody := strings.Replace(string(originalBody), "https://files.oaiusercontent.com", cdnhost, -1)
+			bodyStr := string(originalBody)
+			// 判断字符串是否包含 wss://
+			modifiedBody := strings.Replace(bodyStr, "https://files.oaiusercontent.com", cdnhost, -1)
+
+			if strings.Contains(bodyStr, "wss://") {
+				// 使用正则 wss://中间的域名/client/hubs/conversations  把域名替换成本地域名
+
+				// modifiedBody = strings.Replace(string(modifiedBody), "wss://chatgpt-async-webps-prod-southcentralus-22.webpubsub.azure.com",
+				// "wss://host.docker.internal:7999", -1)
+
+				re := regexp.MustCompile(`wss://([^/]+)/client`)
+
+				// 在URL中搜索匹配的部分
+				matches := re.FindStringSubmatch(bodyStr)
+
+				if len(matches) > 1 {
+					modifiedBody = strings.Replace(modifiedBody, "wss://"+matches[1]+"/client/hubs/conversations?", "ws://127.0.0.1:7999/client/hubs/conversations?host="+matches[1]+"&", -1)
+					g.Log().Debug(ctx, "wss替换成ws", matches[1])
+				} else {
+
+					g.Log().Debug(ctx, "wss替换成ws失败", bodyStr)
+				}
+			}
+
 			// 将修改后的内容写回响应体
 			response.Body = io.NopCloser(bytes.NewBufferString(modifiedBody))
 			// 更新Content-Length
