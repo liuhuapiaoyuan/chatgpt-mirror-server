@@ -23,7 +23,10 @@
         "ms-ceintl.vscode-language-pack-zh-hans",
         "esbenp.prettier-vscode",
         "vue.volar",
-        "sourcegraph.cody-ai"
+        "chunsen.bracket-select",
+        "golang.go",
+        "FittenTech.Fitten-Code",
+        "vscode-icons-team.vscode-icons"
       ]
     }
   },
@@ -32,6 +35,5 @@
     "HTTP_PROXY":"",
     "HTTPS_PROXY":""
   },
-  "postCreateCommand": "make init",
-  "remoteUser": "root"
+  "postCreateCommand": "make init" 
 }

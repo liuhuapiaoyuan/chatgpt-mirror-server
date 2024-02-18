@@ -148,14 +148,27 @@ func AttachGPT4Mobile(ctx g.Ctx, response *http.Response) error {
 		return returnValue
 	}
 	modifiedBody := string(originalBody)
-	if strings.Contains(modifiedBody, "gpt-4") {
-		resJson := gjson.New(modifiedBody)
-		models := resJson.Get("models").Array()
-		newObject := gjson.New(`{"capabilities":{},"description":"Browsing, Advanced Data Analysis, and DALL·E are now built into GPT-4","enabled_tools":["tools","tools2"],"max_tokens":32767,"product_features":{"attachments":{"accepted_mime_types":["text/x-csharp","application/vnd.openxmlformats-officedocument.wordprocessingml.document","text/x-tex","text/x-typescript","text/plain","text/x-ruby","application/msword","text/x-php","text/x-c++","text/markdown","application/x-latext","text/x-c","text/javascript","text/html","application/vnd.openxmlformats-officedocument.presentationml.presentation","application/json","text/x-java","application/pdf","text/x-script.python","text/x-sh"],"can_accept_all_mime_types":true,"image_mime_types":["image/jpeg","image/webp","image/gif","image/png"],"type":"retrieval"}},"slug":"gpt-4-mobile","tags":["confidential","gpt4","plus"],"title":"GPT4 (Mobile)"}`)
-		models = append(models, newObject)
-		resJson.Set("models", models)
-		modifiedBody = resJson.String()
-	}
+	// if strings.Contains(modifiedBody, "gpt-4") {
+	// }
+	resJson := gjson.New(modifiedBody)
+	models := resJson.Get("models").Array()
+	newObject := gjson.New(`{"capabilities":{},"description":"Browsing, Advanced Data Analysis, and DALL·E are now built into GPT-4","enabled_tools":["tools","tools2"],"max_tokens":32767,"product_features":{"attachments":{"accepted_mime_types":["text/x-csharp","application/vnd.openxmlformats-officedocument.wordprocessingml.document","text/x-tex","text/x-typescript","text/plain","text/x-ruby","application/msword","text/x-php","text/x-c++","text/markdown","application/x-latext","text/x-c","text/javascript","text/html","application/vnd.openxmlformats-officedocument.presentationml.presentation","application/json","text/x-java","application/pdf","text/x-script.python","text/x-sh"],"can_accept_all_mime_types":true,"image_mime_types":["image/jpeg","image/webp","image/gif","image/png"],"type":"retrieval"}},"slug":"gpt-4-mobile","tags":["confidential","gpt4","plus"],"title":"GPT4 (Mobile)"}`)
+	models = append(models, newObject)
+	resJson.Set("models", models)
+
+	categories := resJson.Get("categories").Array()
+
+	categories = append(categories, gjson.New(`{
+		"category": "gpt_4",
+		"human_category_name": "GPT-4",
+		"subscription_level": "plus",
+		"default_model": "gpt-4",
+		"browsing_model": "gpt-4-browsing",
+		"code_interpreter_model": "gpt-4-code-interpreter",
+		"plugins_model": "gpt-4-plugins"
+	}`))
+	resJson.Set("categories", categories)
+	modifiedBody = resJson.String()
 	// 将修改后的内容写回响应体
 	response.Body = io.NopCloser(bytes.NewBufferString(modifiedBody))
 	// 更新Content-Length
