@@ -146,10 +146,6 @@ func ProxyAll(r *ghttp.Request) {
 
 				if len(matches) > 1 {
 					modifiedBody = strings.Replace(modifiedBody, "wss://"+matches[1]+"/client/hubs/conversations?", WsUpStream+"/client/hubs/conversations?host="+matches[1]+"&", -1)
-					g.Log().Debug(ctx, "wss替换成ws", matches[1])
-				} else {
-
-					g.Log().Debug(ctx, "wss替换成ws失败", bodyStr)
 				}
 			}
 
