@@ -17,6 +17,9 @@ import (
 func CHATPROXY(ctx g.Ctx) string {
 	return g.Cfg().MustGetWithEnv(ctx, "CHATPROXY").String()
 }
+func WS_SERVICE(ctx g.Ctx) string {
+	return g.Cfg().MustGetWithEnv(ctx, "WS_SERVICE").String()
+}
 
 func AUTHKEY(ctx g.Ctx) string {
 	// g.Log().Debug(ctx, "config.AUTHKEY", g.Cfg().MustGetWithEnv(ctx, "AUTHKEY").String())

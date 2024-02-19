@@ -62,4 +62,6 @@ AUTHKEY: "maidou"
 ONLYTOKEN: false
 CDNHOST: "https://file.chatgpt.ggss.club"
 ASSET_PREFIX: "https://cdn.chatgpt.ggss.club"
+# websocket服务地址
+WS_SERVICE: "ws://host.docker.internal:7999"
 # 5a07e29c-31d8-4976-ba66-f183598587d9

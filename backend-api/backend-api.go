@@ -30,7 +30,7 @@ func init() {
 	s := g.Server()
 	s.BindHandler("/backend-api/*any", ProxyAll)
 	// s.BindHandler("/public-api/*any", ProxyAll)
-	//	s.BindHandler("/_next/data/*any", NextDataGptsFixed)
+	// s.BindHandler("/_next/data/*any", NextDataGptsFixed)
 	backendGroup := s.Group("/backend-api")
 	backendGroup.POST("/accounts/data_export", NotFound) // 禁用导出
 	backendGroup.POST("/payments/checkout", NotFound)    // 禁用支付
@@ -73,6 +73,7 @@ func ProxyAll(r *ghttp.Request) {
 		return
 	}
 	UpStream := config.CHATPROXY(ctx)
+	WsUpStream := config.WS_SERVICE(ctx)
 	u, _ := url.Parse(UpStream)
 	proxy := httputil.NewSingleHostReverseProxy(u)
 	proxy.Transport = &http.Transport{
@@ -138,18 +139,13 @@ func ProxyAll(r *ghttp.Request) {
 			modifiedBody := strings.Replace(bodyStr, "https://files.oaiusercontent.com", cdnhost, -1)
 
 			if strings.Contains(bodyStr, "wss://") {
-				// 使用正则 wss://中间的域名/client/hubs/conversations  把域名替换成本地域名
-
-				// modifiedBody = strings.Replace(string(modifiedBody), "wss://chatgpt-async-webps-prod-southcentralus-22.webpubsub.azure.com",
-				// "wss://host.docker.internal:7999", -1)
-
 				re := regexp.MustCompile(`wss://([^/]+)/client`)
 
 				// 在URL中搜索匹配的部分
 				matches := re.FindStringSubmatch(bodyStr)
 
 				if len(matches) > 1 {
-					modifiedBody = strings.Replace(modifiedBody, "wss://"+matches[1]+"/client/hubs/conversations?", "ws://127.0.0.1:7999/client/hubs/conversations?host="+matches[1]+"&", -1)
+					modifiedBody = strings.Replace(modifiedBody, "wss://"+matches[1]+"/client/hubs/conversations?", WsUpStream+"/client/hubs/conversations?host="+matches[1]+"&", -1)
 					g.Log().Debug(ctx, "wss替换成ws", matches[1])
 				} else {
 
