@@ -42,7 +42,7 @@ func Session(r *ghttp.Request) {
 		sessionJson.Set("accessToken", record["officialSession"].String())
 		service.AccessTokenCache.Set(ctx, userToken.String(), sessionJson.Get("accessToken").String(), 10*24*time.Hour)
 		sessionJson.Set("accessToken", userToken.String())
-		sessionJson.Set("user.email", "admin@openai.com")
+		sessionJson.Set("user.email", "admin@closeai.com")
 		sessionJson.Set("user.name", expireTime)
 		sessionJson.Set("user.image", "/avatars.png")
 		sessionJson.Set("user.picture", "/avatars.png")
@@ -85,7 +85,7 @@ func Session(r *ghttp.Request) {
 
 		service.AccessTokenCache.Set(ctx, userToken.String(), sessionJson.Get("accessToken").String(), 10*24*time.Hour)
 		sessionJson.Set("accessToken", userToken.String())
-		sessionJson.Set("user.email", "admin@openai.com")
+		sessionJson.Set("user.email", "admin@closeai.com")
 		sessionJson.Set("user.name", expireTime)
 		sessionJson.Set("user.image", "/avatars.png")
 		sessionJson.Set("user.picture", "/avatars.png")

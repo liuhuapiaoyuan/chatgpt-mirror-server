@@ -30,7 +30,7 @@ func init() {
 	s := g.Server()
 	s.BindHandler("/backend-api/*any", ProxyAll)
 	// s.BindHandler("/public-api/*any", ProxyAll)
-	// s.BindHandler("/_next/data/*any", NextDataGptsFixed)
+	//s.BindHandler("/_next/data/*any", NextDataGptsFixed)
 	backendGroup := s.Group("/backend-api")
 	backendGroup.POST("/accounts/data_export", NotFound) // 禁用导出
 	backendGroup.POST("/payments/checkout", NotFound)    // 禁用支付
@@ -109,7 +109,7 @@ func ProxyAll(r *ghttp.Request) {
 		}
 
 		// 判断response的Cotnent-Type是否是json
-		if response.Header.Get("Content-Type") == "application/json" {
+		if strings.Contains(response.Header.Get("Content-Type"), "json") {
 			isStream = false
 		}
 		if isCreateConversation {

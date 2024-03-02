@@ -24,8 +24,8 @@ func Index(r *ghttp.Request) {
         "pageProps": {
             "user": {
                 "id": "user-xyhelper",
-                "name": "admin@openai.com",
-                "email": "admin@openai.com",
+                "name": "admin@closeai.com",
+                "email": "admin@closeai.com",
                 "image": "/avatars.png",
                 "picture": "/avatars.png",
                 "idp": "auth0",
@@ -86,8 +86,8 @@ func C(r *ghttp.Request) {
       "pageProps": {
         "user": {
           "id": "user-xyhelper",
-          "name": "admin@openai.com",
-          "email": "admin@openai.com",
+          "name": "admin@closeai.com",
+          "email": "admin@closeai.com",
           "image": "/avatars.png",
           "picture": "/avatars.png",
           "idp": "auth0",
@@ -142,8 +142,8 @@ func Gpts(r *ghttp.Request) {
       "pageProps": {
         "user": {
           "id": "user-xyhelper",
-          "name": "admin@openai.com",
-          "email": "admin@openai.com",
+          "name": "admin@closeai.com",
+          "email": "admin@closeai.com",
           "image": "/avatars.png",
           "picture": "/avatars.png",
           "idp": "auth0",
@@ -195,8 +195,8 @@ func Discovery(r *ghttp.Request) {
       "pageProps": {
         "user": {
           "id": "user-xyhelper",
-          "name": "admin@openai.com",
-          "email": "admin@openai.com",
+          "name": "admin@closeai.com",
+          "email": "admin@closeai.com",
           "image": "/avatars.png",
           "picture": "/avatars.png",
           "idp": "auth0",
@@ -249,8 +249,8 @@ func Editor(r *ghttp.Request) {
       "pageProps": {
         "user": {
           "id": "user-xyhelper",
-          "name": "admin@openai.com",
-          "email": "admin@openai.com",
+          "name": "admin@closeai.com",
+          "email": "admin@closeai.com",
           "image": "/avatars.png",
           "picture": "/avatars.png",
           "idp": "auth0",
@@ -311,8 +311,8 @@ func Slug(r *ghttp.Request) {
       "pageProps": {
         "user": {
           "id": "user-xyhelper",
-          "name": "admin@openai.com",
-          "email": "admin@openai.com",
+          "name": "admin@closeai.com",
+          "email": "admin@closeai.com",
           "image": "/avatars.png",
           "picture": "/avatars.png",
           "idp": "auth0",
@@ -370,8 +370,8 @@ func G(r *ghttp.Request) {
         "gizmo": null,
         "user": {
           "id": "user-xyhelper",
-          "name": "admin@openai.com",
-          "email": "admin@openai.com",
+          "name": "admin@closeai.com",
+          "email": "admin@closeai.com",
           "image": "/avatars.png",
           "picture": "/avatars.png",
           "idp": "auth0",
@@ -411,7 +411,6 @@ func G(r *ghttp.Request) {
 	})
 }
 
-// GC 游戏会话
 func GC(r *ghttp.Request) {
 
 	if r.Session.MustGet("offical-session").IsEmpty() {
@@ -428,8 +427,8 @@ func GC(r *ghttp.Request) {
       "pageProps": {
         "user": {
           "id": "user-xyhelper",
-          "name": "admin@openai.com",
-          "email": "admin@openai.com",
+          "name": "admin@closeai.com",
+          "email": "admin@closeai.com",
           "image": "/avatars.png",
           "picture": "/avatars.png",
           "idp": "auth0",
@@ -485,8 +484,8 @@ func Mine(r *ghttp.Request) {
         "pageProps": {
             "user": {
                 "id": "user-xyhelper",
-                "name": "admin@openai.com",
-                "email": "admin@openai.com",
+                "name": "admin@closeai.com",
+                "email": "admin@closeai.com",
                 "image": "/avatars.png",
                 "picture": "/avatars.png",
                 "idp": "auth0",

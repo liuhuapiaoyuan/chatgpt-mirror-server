@@ -54,11 +54,11 @@ func Me(r *ghttp.Request) {
 		return
 	}
 	resJson := gjson.New(resStr)
-	resJson.Set("email", "admin@openai.com")
+	resJson.Set("email", "__mirror@closeai.com")
 	resJson.Set("name", record["user_username"].String())
 	resJson.Set("picture", "/avatars.png")
-	resJson.Set("phone_number", "+1911")
-	resJson.Set("orgs.data.0.description", "OpenAI")
+	resJson.Set("phone_number", "+1911011")
+	resJson.Set("orgs.data.0.description", "closeai")
 	// resJson.Dump()
 	r.Response.WriteJson(resJson)
 }
