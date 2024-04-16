@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.1](https://github.com/liuhuapiaoyuan/chatgpt-mirror-server/compare/v1.2.0...v1.2.1) (2024-04-16)
+
+
+### Bug Fixes
+
+* remove unused ctx ([60b472a](https://github.com/liuhuapiaoyuan/chatgpt-mirror-server/commit/60b472acd097efb13d9577b89b34ad229fa66e47))
+* 修复标题获取失败导致无法保存聊天记录的问题 ([af78fe2](https://github.com/liuhuapiaoyuan/chatgpt-mirror-server/commit/af78fe2718ee771ae2b45def7efb775adfb26cf4))
+
 ## [1.2.0](https://github.com/liuhuapiaoyuan/chatgpt-mirror-server/compare/v1.1.0...v1.2.0) (2024-04-16)
 
 
