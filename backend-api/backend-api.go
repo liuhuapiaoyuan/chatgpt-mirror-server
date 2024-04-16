@@ -290,7 +290,6 @@ func AttachGPT4Mobile(ctx g.Ctx, response *http.Response) error {
 
 // 创建信息，接受参数 conversationId
 func CreateConversation(r *ghttp.Request, userId int, chatgptId int, userToken string, userAgent string, conversationPath string) {
-	ctx := r.GetCtx()
 	id := strings.Split(conversationPath, "/")[4]
 	r.Request.Header.Set("Authorization", "Bearer "+userToken)
 	resStr, err := ProxyRequestGet("/backend-api/conversation/"+id, r)
