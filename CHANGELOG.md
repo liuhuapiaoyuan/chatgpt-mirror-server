@@ -1,5 +1,29 @@
 # Changelog
 
+## [1.2.0](https://github.com/liuhuapiaoyuan/chatgpt-mirror-server/compare/v1.1.0...v1.2.0) (2024-04-16)
+
+
+### Features
+
+* 增加ws的兼容 ([45e87aa](https://github.com/liuhuapiaoyuan/chatgpt-mirror-server/commit/45e87aa550962cd002db7592ac5ee151018c7387))
+* 适配最新的gpts store ([2aeb536](https://github.com/liuhuapiaoyuan/chatgpt-mirror-server/commit/2aeb536128b1fda191652d645a53d8282552fb31))
+
+
+### Bug Fixes
+
+* remove any console ([22e2cbb](https://github.com/liuhuapiaoyuan/chatgpt-mirror-server/commit/22e2cbb695703e2e59507867ac5176f63129cd90))
+* update ui version ([c2cf4d1](https://github.com/liuhuapiaoyuan/chatgpt-mirror-server/commit/c2cf4d1624dd4ff0a8497c6f798195167935557e))
+* 修复点击gpts页面白屏问题 ([2aeb536](https://github.com/liuhuapiaoyuan/chatgpt-mirror-server/commit/2aeb536128b1fda191652d645a53d8282552fb31))
+* 修复网关地址问题 ([b12d4d1](https://github.com/liuhuapiaoyuan/chatgpt-mirror-server/commit/b12d4d18240d9f57b803f815a1b48da45339db46))
+* 修复账号保存后，无法自动更新token ([fbbccc1](https://github.com/liuhuapiaoyuan/chatgpt-mirror-server/commit/fbbccc1e22b7d6004c87267221815a7b46bd159a))
+* 修复账号密码登录的错误问题 ([8c424fd](https://github.com/liuhuapiaoyuan/chatgpt-mirror-server/commit/8c424fd55360ef6ca8cc3b85539af5d076ed0453))
+* 修改一些细节 ([fbd43e1](https://github.com/liuhuapiaoyuan/chatgpt-mirror-server/commit/fbd43e1f59649794dc2f9b6d9111d581da0cb8f8))
+* 增加JA3_PROXY的配置，方便后续更新 ([d8633a8](https://github.com/liuhuapiaoyuan/chatgpt-mirror-server/commit/d8633a86755111247835629be5d31831c52eee86))
+* 增加websocket代理地址 ([b30f4ba](https://github.com/liuhuapiaoyuan/chatgpt-mirror-server/commit/b30f4baf595d9e93f260a91959b8423f41544b53))
+* 调整一些调试日志info-&gt;debug ([bb9d470](https://github.com/liuhuapiaoyuan/chatgpt-mirror-server/commit/bb9d47055e78a39023ee41cfd053a26ff9f6df51))
+* 调整部分细节 ([eed4abb](https://github.com/liuhuapiaoyuan/chatgpt-mirror-server/commit/eed4abbebf1d412c2a1ffe233cb6b01671049f5c))
+* 适配最新的gps的UI ([0d38e0b](https://github.com/liuhuapiaoyuan/chatgpt-mirror-server/commit/0d38e0bdd32662979943b8c196382b5a9310f345))
+
 ## [1.1.0](https://github.com/liuhuapiaoyuan/chatgpt-mirror-server/compare/v1.0.0...v1.1.0) (2024-01-06)
 
 
