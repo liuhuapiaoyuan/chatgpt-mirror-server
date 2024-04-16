@@ -2,6 +2,7 @@ package publicapi
 
 import (
 	"chatgpt-mirror-server/config"
+	"crypto/tls"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -17,6 +18,11 @@ func ProxyPublic(r *ghttp.Request) {
 	proxy.ErrorHandler = func(writer http.ResponseWriter, request *http.Request, e error) {
 		g.Log().Error(ctx, e)
 		writer.WriteHeader(http.StatusBadGateway)
+	}
+	proxy.Transport = &http.Transport{
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: true,
+		},
 	}
 	newreq := r.Request.Clone(ctx)
 	newreq.URL.Host = u.Host

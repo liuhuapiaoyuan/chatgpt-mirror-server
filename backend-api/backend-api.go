@@ -5,6 +5,7 @@ import (
 	"chatgpt-mirror-server/config"
 	"chatgpt-mirror-server/modules/chatgpt/model"
 	"chatgpt-mirror-server/modules/chatgpt/service"
+	"chatgpt-mirror-server/utility"
 	"compress/gzip"
 	"crypto/tls"
 	"io"
@@ -48,6 +49,69 @@ func NotFound(r *ghttp.Request) {
 	r.Response.WriteStatus(http.StatusNotFound)
 }
 
+// 代理请求
+func ProxyRequestGet(path string, r *ghttp.Request) (resStr string, err error) {
+	ctx := r.GetCtx()
+	userToken := ""
+	Authorization := r.Header.Get("Authorization")
+	if Authorization != "" {
+		userToken = r.Header.Get("Authorization")[7:]
+	}
+	userId, chatgptId, accessToken, err := ChatgptSessionService.GetAccessToken(ctx, userToken)
+
+	g.Log().Debug(ctx, "userToken", userToken)
+	g.Log().Debug(ctx, "userId", userId)
+	g.Log().Debug(ctx, "chatgptId", chatgptId)
+	UpStream := config.CHATPROXY(ctx)
+	if err != nil {
+		// 处理错误
+		panic(err)
+	}
+
+	// 设置HTTP Transport
+	transport := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	if config.Ja3Proxy != nil {
+		g.Log().Debug(ctx, "存在ja3proxy 重新配置")
+
+		transport = &http.Transport{
+			Proxy: http.ProxyURL(config.Ja3Proxy),
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
+		}
+	}
+	// 创建HTTP客户端
+	client := &http.Client{Transport: transport}
+
+	// 设置请求头
+	req, err := http.NewRequestWithContext(ctx, "GET", UpStream+"/backend-api/me", nil)
+	if err != nil {
+		// 处理错误
+		panic(err)
+	}
+	req.Header.Add("Authorization", "Bearer "+accessToken)
+	req.Header.Add("User-Agent", r.Header.Get("User-Agent"))
+	req.Header.Set("Host", "chat.openai.com")
+	req.Header.Set("Origin", "https://chat.openai.com/chat")
+	req.Header.Set("Referer", "https://chat.openai.com/")
+
+	// 使用客户端发送请求
+	resp, err := client.Do(req)
+	if err != nil {
+		// 处理错误
+		panic(err)
+	}
+	defer resp.Body.Close()
+	originalBody, shouldReturn, err := loadRespString(resp)
+	if err != nil || shouldReturn {
+		return "", err
+	}
+	return string(originalBody), nil
+
+}
+
 func ProxyAll(r *ghttp.Request) {
 
 	ctx := r.GetCtx()
@@ -72,28 +136,43 @@ func ProxyAll(r *ghttp.Request) {
 		r.Response.WriteStatus(http.StatusUnauthorized)
 		return
 	}
-	UpStream := config.CHATPROXY(ctx)
 	WsUpStream := config.WS_SERVICE(ctx)
-	u, _ := url.Parse(UpStream)
-	proxy := httputil.NewSingleHostReverseProxy(u)
-	proxy.Transport = &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}
-	proxy.ErrorHandler = func(writer http.ResponseWriter, request *http.Request, e error) {
-		g.Log().Error(ctx, e)
-		writer.WriteHeader(http.StatusBadGateway)
-	}
-	newreq := r.Request.Clone(ctx)
-	newreq.URL.Host = u.Host
-	newreq.URL.Scheme = u.Scheme
-	newreq.Host = u.Host
-	newreq.Header.Set("authkey", config.AUTHKEY(ctx))
+	// g.Log().Info(ctx, "ProxyBackendApi:", path)
+	proxy := &httputil.ReverseProxy{}
+	UpStream := config.CHATPROXY(ctx)
 
-	newreq.Header.Set("Host", "chat.openai.com")
-	newreq.Header.Set("Origin", "https://chat.openai.com/chat")
-	if accessToken != "" {
-		newreq.Header.Set("Authorization", "Bearer "+accessToken)
+	proxy.Transport = &http.Transport{
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: true,
+		},
 	}
+	if config.Ja3Proxy != nil {
+		proxy.Transport = &http.Transport{
+			Proxy: http.ProxyURL(config.Ja3Proxy),
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
+		}
+	}
+	OPENAI, err := url.Parse(UpStream)
+	if err != nil {
+		g.Log().Error(ctx, err)
+		r.Response.WriteStatus(http.StatusServiceUnavailable)
+		return
+	}
+	proxy.Rewrite = func(proxyRequest *httputil.ProxyRequest) {
+		proxyRequest.SetURL(OPENAI)
+	}
+
+	header := r.Request.Header
+	header.Set("Origin", "https://chat.openai.com")
+	header.Set("Referer", "https://chat.openai.com/")
+	// header.Del("Cookie")
+	header.Del("Accept-Encoding")
+	if accessToken != "" {
+		header.Set("Authorization", "Bearer "+accessToken)
+	}
+	utility.HeaderModify(&r.Request.Header)
 
 	// g.Dump(newreq.URL)
 	cdnhost := config.CDNHOST(ctx)
@@ -161,7 +240,7 @@ func ProxyAll(r *ghttp.Request) {
 		return nil
 	}
 
-	proxy.ServeHTTP(r.Response.Writer.RawWriter(), newreq)
+	proxy.ServeHTTP(r.Response.RawWriter(), r.Request)
 
 }
 

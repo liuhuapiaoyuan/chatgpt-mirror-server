@@ -1,7 +1,6 @@
 package backendapi
 
 import (
-	"chatgpt-mirror-server/config"
 	"net/http"
 
 	"github.com/gogf/gf/v2/encoding/gjson"
@@ -20,39 +19,40 @@ func Me(r *ghttp.Request) {
 		r.Response.WriteStatus(http.StatusUnauthorized)
 		return
 	}
-	if record.IsEmpty() {
-		g.Log().Error(ctx, "session is empty")
-		r.Response.WriteStatus(http.StatusUnauthorized)
-		return
-	}
-	AccessToken := ""
-	// 如果 record mode ==1
-	if record["mode"].Int() == 1 {
-		AccessToken = record["officialSession"].String()
-	} else {
-		officialSession := gjson.New(record["officialSession"].String())
-		AccessToken = officialSession.Get("accessToken").String()
+	// if record.IsEmpty() {
+	// 	g.Log().Error(ctx, "session is empty")
+	// 	r.Response.WriteStatus(http.StatusUnauthorized)
+	// 	return
+	// }
+	// AccessToken := ""
+	// // 如果 record mode ==1
+	// if record["mode"].Int() == 1 {
+	// 	AccessToken = record["officialSession"].String()
+	// } else {
+	// 	officialSession := gjson.New(record["officialSession"].String())
+	// 	AccessToken = officialSession.Get("accessToken").String()
 
-	}
+	// }
+	resStr, err := ProxyRequestGet("/backend-api/me", r)
 
-	UpStream := config.CHATPROXY(ctx)
-	// 请求后端接口
-	res, err := g.Client().SetHeaderMap(map[string]string{
-		"Authorization": "Bearer " + AccessToken,
-		"User-Agent":    r.Header.Get("User-Agent"),
-		"authKey":       config.AUTHKEY(ctx),
-	}).Get(ctx, UpStream+"/backend-api/me")
+	// UpStream := config.CHATPROXY(ctx)
+	// // 请求后端接口
+	// res, err := g.Client().SetHeaderMap(map[string]string{
+	// 	"Authorization": "Bearer " + AccessToken,
+	// 	"User-Agent":    r.Header.Get("User-Agent"),
+	// 	"authKey":       config.AUTHKEY(ctx),
+	// }).Get(ctx, UpStream+"/backend-api/me")
 	if err != nil {
 		r.Response.WriteStatus(http.StatusUnauthorized)
 		return
 	}
-	resStr := res.ReadAllString()
-	if res.StatusCode != http.StatusOK {
-		r.Response.Status = res.StatusCode
-		r.Response.Write(resStr)
+	// resStr := res.ReadAllString()
+	// if res.StatusCode != http.StatusOK {
+	// 	r.Response.Status = res.StatusCode
+	// 	r.Response.Write(resStr)
 
-		return
-	}
+	// 	return
+	// }
 	resJson := gjson.New(resStr)
 	resJson.Set("email", "__mirror@closeai.com")
 	resJson.Set("name", record["user_username"].String())

@@ -2,11 +2,13 @@ package config
 
 import (
 	"math/rand"
+	"net/url"
 	"time"
 
 	"github.com/gogf/gf/v2/container/garray"
 	"github.com/gogf/gf/v2/encoding/gjson"
 	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/net/gclient"
 	"github.com/gogf/gf/v2/os/gctx"
 	"github.com/gogf/gf/v2/os/gfile"
 	"github.com/gogf/gf/v2/os/gview"
@@ -33,12 +35,14 @@ func USERTOKENLOCK(ctx g.Ctx) bool {
 var (
 	DefaultModel = "text-davinci-002-render-sha"
 	FreeModels   = garray.NewStrArray()
+	Ja3Proxy     *url.URL // ja3代理
 	PlusModels   = garray.NewStrArray()
 	ArkoseUrl    = "https://tcr9i.closeai.biz/v2/"
 	BuildId      = "LxJWDayKNMzRjO_Ay4ljN"
 	CacheBuildId = "LxJWDayKNMzRjO_Ay4ljN"
 	AssetPrefix  = "https://oaistatic-cdn.closeai.biz"
 	PK40         = "35536E1E-65B4-4D96-9D97-6ADB7EFF8147"
+	ProxyClient  *gclient.Client
 	PK35         = "3D86FBBA-9D22-402A-B512-3420086BA6CC"
 	envScriptTpl = `
 	<script>
@@ -52,6 +56,29 @@ var (
 
 func init() {
 	ctx := gctx.GetInitCtx()
+	ProxyClient = g.Client().SetBrowserMode(true).SetHeaderMap(g.MapStrStr{
+		"Origin":     "https://chat.openai.com",
+		"Referer":    "https://chat.openai.com/",
+		"Host":       "chat.openai.com",
+		"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
+	})
+	// 读取ja3代理
+	ja3Proxy := g.Cfg().MustGetWithEnv(ctx, "JA3_PROXY").String()
+	if ja3Proxy != "" {
+
+		u, err := url.Parse(ja3Proxy)
+		if err != nil {
+			panic(err)
+		}
+		Ja3Proxy = u
+		g.Log().Info(ctx, "JA3_PROXY:", Ja3Proxy.String())
+		ProxyClient = g.Client().Proxy(Ja3Proxy.String()).SetBrowserMode(true).SetHeaderMap(g.MapStrStr{
+			"Origin":     "https://chat.openai.com",
+			"Referer":    "https://chat.openai.com/",
+			"Host":       "chat.openai.com",
+			"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
+		})
+	}
 
 	FreeModels.Append("text-davinci-002-render-sha")
 	FreeModels.Append("text-davinci-002-render-sha-mobile")
