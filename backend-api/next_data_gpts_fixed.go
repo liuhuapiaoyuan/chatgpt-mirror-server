@@ -21,7 +21,7 @@ func NextDataGptsFixed(r *ghttp.Request) {
 		u, _ := url.Parse(UpStream)
 		proxy := httputil.NewSingleHostReverseProxy(u)
 		proxy.Transport = &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, ForceAttemptHTTP2: true,
 		}
 		proxy.ErrorHandler = func(writer http.ResponseWriter, request *http.Request, e error) {
 			g.Log().Error(ctx, e)

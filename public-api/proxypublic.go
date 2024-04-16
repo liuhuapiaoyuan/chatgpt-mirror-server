@@ -23,6 +23,7 @@ func ProxyPublic(r *ghttp.Request) {
 		TLSClientConfig: &tls.Config{
 			InsecureSkipVerify: true,
 		},
+		ForceAttemptHTTP2: true,
 	}
 	newreq := r.Request.Clone(ctx)
 	newreq.URL.Host = u.Host

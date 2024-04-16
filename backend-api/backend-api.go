@@ -73,31 +73,34 @@ func ProxyRequestGet(path string, r *ghttp.Request) (resStr string, err error) {
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
 	if config.Ja3Proxy != nil {
-		g.Log().Debug(ctx, "存在ja3proxy 重新配置")
-
 		transport = &http.Transport{
 			Proxy: http.ProxyURL(config.Ja3Proxy),
 			TLSClientConfig: &tls.Config{
 				InsecureSkipVerify: true,
 			},
+			ForceAttemptHTTP2: true,
 		}
 	}
 	// 创建HTTP客户端
 	client := &http.Client{Transport: transport}
 
 	// 设置请求头
-	req, err := http.NewRequestWithContext(ctx, "GET", UpStream+"/backend-api/me", nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", UpStream+path, nil)
 	if err != nil {
 		// 处理错误
 		panic(err)
 	}
-	req.Header.Add("Authorization", "Bearer "+accessToken)
-	req.Header.Add("User-Agent", r.Header.Get("User-Agent"))
+	// 遍历原始请求的Header，并将它们复制到另一个请求的Header中
+	for key, values := range r.Header {
+		for _, value := range values {
+			req.Header.Add(key, value)
+		}
+	}
+	req.Header.Set("Authorization", "Bearer "+accessToken)
 	req.Header.Set("Host", "chat.openai.com")
 	req.Header.Set("Origin", "https://chat.openai.com/chat")
 	req.Header.Set("Referer", "https://chat.openai.com/")
-
-	// 使用客户端发送请求
+	utility.HeaderModify(&req.Header)
 	resp, err := client.Do(req)
 	if err != nil {
 		// 处理错误
@@ -145,6 +148,7 @@ func ProxyAll(r *ghttp.Request) {
 		TLSClientConfig: &tls.Config{
 			InsecureSkipVerify: true,
 		},
+		ForceAttemptHTTP2: true,
 	}
 	if config.Ja3Proxy != nil {
 		proxy.Transport = &http.Transport{
@@ -152,6 +156,7 @@ func ProxyAll(r *ghttp.Request) {
 			TLSClientConfig: &tls.Config{
 				InsecureSkipVerify: true,
 			},
+			ForceAttemptHTTP2: true,
 		}
 	}
 	OPENAI, err := url.Parse(UpStream)
@@ -192,7 +197,7 @@ func ProxyAll(r *ghttp.Request) {
 			isStream = false
 		}
 		if isCreateConversation {
-			CreateConversation(ctx, userId, chatgptId, accessToken, r.UserAgent(), path)
+			CreateConversation(r, userId, chatgptId, userToken, r.UserAgent(), path)
 		} else if isLoadModels {
 			AttachGPT4Mobile(ctx, response)
 		} else if isShare {
@@ -284,20 +289,14 @@ func AttachGPT4Mobile(ctx g.Ctx, response *http.Response) error {
 }
 
 // 创建信息，接受参数 conversationId
-func CreateConversation(ctx g.Ctx, userId int, chatgptId int, AccessToken string, userAgent string, conversationPath string) {
-	// 提取 /backend-api/conversation/gen_title/{id}
+func CreateConversation(r *ghttp.Request, userId int, chatgptId int, userToken string, userAgent string, conversationPath string) {
+	ctx := r.GetCtx()
 	id := strings.Split(conversationPath, "/")[4]
-
-	UpStream := config.CHATPROXY(ctx)
-	// 请求后端接口
-	res, err := g.Client().SetHeaderMap(map[string]string{
-		"Authorization": "Bearer " + AccessToken,
-		"User-Agent":    userAgent,
-	}).Get(ctx, UpStream+"/backend-api/conversation/"+id)
+	r.Request.Header.Set("Authorization", "Bearer "+userToken)
+	resStr, err := ProxyRequestGet("/backend-api/conversation/"+id, r)
 	if err != nil {
 		return
 	}
-	resStr := res.ReadAllString()
 	resJson := gjson.New(resStr)
 
 	history := model.NewChatgptHistory()
@@ -308,7 +307,6 @@ func CreateConversation(ctx g.Ctx, userId int, chatgptId int, AccessToken string
 	history.ConversationId = resJson.Get("conversation_id").String()
 	// 账号ID
 	history.ChatgptId = chatgptId
-
 	conversationTemplateId := resJson.Get("conversation_template_id").String()
 	if conversationTemplateId != "" {
 		history.ConversationTemplate_id = conversationTemplateId
