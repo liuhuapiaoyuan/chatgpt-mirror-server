@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.2](https://github.com/liuhuapiaoyuan/chatgpt-mirror-server/compare/v1.2.1...v1.2.2) (2024-04-16)
+
+
+### Bug Fixes
+
+* 修复public-api没有ja3的配置 ([1aeb052](https://github.com/liuhuapiaoyuan/chatgpt-mirror-server/commit/1aeb0529e194377dc2d01759346f3fa4ffbc6ab5))
+
 ## [1.2.1](https://github.com/liuhuapiaoyuan/chatgpt-mirror-server/compare/v1.2.0...v1.2.1) (2024-04-16)
 
 
