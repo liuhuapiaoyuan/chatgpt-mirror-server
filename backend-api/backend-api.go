@@ -57,11 +57,8 @@ func ProxyRequestGet(path string, r *ghttp.Request) (resStr string, err error) {
 	if Authorization != "" {
 		userToken = r.Header.Get("Authorization")[7:]
 	}
-	userId, chatgptId, accessToken, err := ChatgptSessionService.GetAccessToken(ctx, userToken)
+	_, _, accessToken, err := ChatgptSessionService.GetAccessToken(ctx, userToken)
 
-	g.Log().Debug(ctx, "userToken", userToken)
-	g.Log().Debug(ctx, "userId", userId)
-	g.Log().Debug(ctx, "chatgptId", chatgptId)
 	UpStream := config.CHATPROXY(ctx)
 	if err != nil {
 		// 处理错误
@@ -96,6 +93,7 @@ func ProxyRequestGet(path string, r *ghttp.Request) (resStr string, err error) {
 			req.Header.Add(key, value)
 		}
 	}
+	req.Header.Set("authkey", config.AUTHKEY(ctx))
 	req.Header.Set("Authorization", "Bearer "+accessToken)
 	req.Header.Set("Host", "chat.openai.com")
 	req.Header.Set("Origin", "https://chat.openai.com/chat")
@@ -104,6 +102,7 @@ func ProxyRequestGet(path string, r *ghttp.Request) (resStr string, err error) {
 	resp, err := client.Do(req)
 	if err != nil {
 		// 处理错误
+		g.Log().Error(ctx, err)
 		panic(err)
 	}
 	defer resp.Body.Close()
@@ -124,8 +123,6 @@ func ProxyAll(r *ghttp.Request) {
 	if Authorization != "" {
 		userToken = r.Header.Get("Authorization")[7:]
 	}
-	g.Log().Debug(ctx, "userToken", userToken)
-
 	isStream := strings.Contains(r.Header.Get("accept"), "text/event-stream")
 
 	// 获得当前的请求域名
@@ -191,7 +188,6 @@ func ProxyAll(r *ghttp.Request) {
 			// log content-type
 			g.Log().Debug(ctx, "content-type", response.Header.Get("Content-Type"))
 		}
-
 		// 判断response的Cotnent-Type是否是json
 		if strings.Contains(response.Header.Get("Content-Type"), "json") {
 			isStream = false
@@ -292,6 +288,7 @@ func AttachGPT4Mobile(ctx g.Ctx, response *http.Response) error {
 func CreateConversation(r *ghttp.Request, userId int, chatgptId int, userToken string, userAgent string, conversationPath string) {
 	id := strings.Split(conversationPath, "/")[4]
 	r.Request.Header.Set("Authorization", "Bearer "+userToken)
+	g.Log().Info(r.GetCtx(), "准备开始创建话题CreateConversation", id)
 	resStr, err := ProxyRequestGet("/backend-api/conversation/"+id, r)
 	if err != nil {
 		return

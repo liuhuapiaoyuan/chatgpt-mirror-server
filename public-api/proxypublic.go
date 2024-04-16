@@ -2,6 +2,7 @@ package publicapi
 
 import (
 	"chatgpt-mirror-server/config"
+	"chatgpt-mirror-server/utility"
 	"crypto/tls"
 	"net/http"
 	"net/http/httputil"
@@ -25,12 +26,21 @@ func ProxyPublic(r *ghttp.Request) {
 		},
 		ForceAttemptHTTP2: true,
 	}
+	if config.Ja3Proxy != nil {
+		proxy.Transport = &http.Transport{
+			Proxy: http.ProxyURL(config.Ja3Proxy),
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
+			ForceAttemptHTTP2: true,
+		}
+	}
 	newreq := r.Request.Clone(ctx)
 	newreq.URL.Host = u.Host
 	newreq.URL.Scheme = u.Scheme
 	newreq.Host = u.Host
 	newreq.Header.Set("authkey", config.AUTHKEY(ctx))
-
+	utility.HeaderModify(&newreq.Header)
 	// newreq.Header.Set("Cookie", "__Secure-next-auth.session-token="+carinfo.RefreshCookie)
 	// // 去除header 中的 压缩
 	// newreq.Header.Del("Accept-Encoding")
