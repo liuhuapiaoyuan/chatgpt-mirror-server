@@ -18,21 +18,7 @@ func Me(r *ghttp.Request) {
 		g.Log().Error(ctx, err)
 		r.Response.WriteStatus(http.StatusUnauthorized)
 		return
-	}
-	// if record.IsEmpty() {
-	// 	g.Log().Error(ctx, "session is empty")
-	// 	r.Response.WriteStatus(http.StatusUnauthorized)
-	// 	return
-	// }
-	// AccessToken := ""
-	// // 如果 record mode ==1
-	// if record["mode"].Int() == 1 {
-	// 	AccessToken = record["officialSession"].String()
-	// } else {
-	// 	officialSession := gjson.New(record["officialSession"].String())
-	// 	AccessToken = officialSession.Get("accessToken").String()
-
-	// }
+	} 
 	resStr, err := ProxyRequestGet("/backend-api/me", r)
 
 	// UpStream := config.CHATPROXY(ctx)
@@ -54,8 +40,8 @@ func Me(r *ghttp.Request) {
 	// 	return
 	// }
 	resJson := gjson.New(resStr)
-	resJson.Set("email", "__mirror@closeai.com")
-	resJson.Set("name", record["user_username"].String())
+	resJson.Set("email", "admin@closeai.com")
+	resJson.Set("name", record["user_username"].String()+expireTime)
 	resJson.Set("picture", "/avatars.png")
 	resJson.Set("phone_number", "+1911011")
 	resJson.Set("orgs.data.0.description", "closeai")

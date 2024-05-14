@@ -38,7 +38,7 @@ export default defineComponent({
 		},
 		arkosUrl: {
 			type: String,
-			default: "https://client-api.arkoselabs.com"
+			default: ""
 		}
 	},
 	data() {

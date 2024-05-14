@@ -191,7 +191,7 @@ func ClearChatHistory(ctx g.Ctx, officalSession string) {
 		return
 	}
 	g.Log().Debug(ctx, "ChatgptSessionService.ClearChatHistory", "officalSession", officalSession)
-	clearUrl := config.CHATPROXY(ctx) + "/backend-api/conversations"
+	clearUrl := config.CHATPROXY + "/backend-api/conversations"
 	accessToken := gjson.New(officalSession).Get("accessToken").String()
 	// 请求内容 {"is_visible":false}
 	client := g.Client()

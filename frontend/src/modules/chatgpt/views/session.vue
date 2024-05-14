@@ -28,7 +28,7 @@
 		<f-k-arkos
 			:public-key="publicKey"
 			mode="lightbox"
-			arkosUrl="https://tcr9i.xyhelper.cn"
+			arkosUrl=""
 			@onCompleted="onCompleted($event)"
 			@onError="onError($event)"
 		/>
@@ -105,19 +105,42 @@ const Upsert = useUpsert({
 		if (!data.userID) {
 			data.userID = 0;
 		}
-		localStorage.removeItem("arkoseToken");
-		window.myEnforcement.run();
+		// localStorage.removeItem("arkoseToken");
+		if (!data.officialSession) {
+			console.log("onOpened---------->", data.officialSession);
+			ElMessage({
+				message: "请稍等,人机验证进行中.",
+				type: "warning"
+			});
+			window.myEnforcement.run();
+		}
 	},
 	onSubmit(data, { done, close, next }) {
 		// 自动生成uuid 作为userToken
 		let arkoseToken = localStorage.getItem("arkoseToken");
+		let w = window;
+
 		if (arkoseToken) {
+			localStorage.removeItem("arkoseToken");
+
 			next({ ...data, arkoseToken });
 			done();
 			close();
 		} else {
-			alert("请刷新页面，重新验证");
-			done();
+			if (!data.officialSession) {
+				w.myEnforcement.run();
+				ElMessage({
+					message: "请稍等,人机验证进行中,验证完成后请重新点击确定保存.",
+					type: "warning"
+				});
+				// alert("请先完成人机验证");
+
+				done();
+			} else {
+				next(data);
+				done();
+				close();
+			}
 		}
 	}
 });
@@ -170,6 +193,8 @@ const Crud = useCrud(
 <script lang="ts">
 import FKArkos from "./FKArkos.vue";
 import { defineComponent } from "vue";
+import { ElMessage, ElMessageBox } from "element-plus";
+
 export default defineComponent({
 	components: {
 		FKArkos
@@ -184,13 +209,31 @@ export default defineComponent({
 	methods: {
 		onCompleted(token: string) {
 			console.log("onCompleted---------->", token);
+			ElMessage({
+				message: "人机验证已完成.",
+				type: "success"
+			});
 			localStorage.setItem("arkoseToken", token);
+			// 设置过期时间 tokenExpire 为4分钟
+			// let tokenExpire = now.getTime() + 4 * 60 * 1000;
+			// localStorage.setItem("tokenExpire", tokenExpire);
 
 			this.arkoseToken = token;
 			// router.replace({ path: "/dashboard" });
 		},
 		onError(errorMessage: any) {
-			alert(errorMessage);
+			// alert(errorMessage);
+			ElMessageBox.alert("加载人机验证失败,请刷新页面重试!", errorMessage.error.error, {
+				// if you want to disable its autofocus
+				// autofocus: false,
+				confirmButtonText: "OK"
+				// callback: (action: Action) => {
+				// 	ElMessage({
+				// 		type: "info",
+				// 		message: `action: ${action}`
+				// 	});
+				// }
+			});
 		},
 
 		onSubmit() {

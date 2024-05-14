@@ -34,6 +34,12 @@ func RefreshSession(ctx g.Ctx) {
 		g.Log().Info(ctx, "RefreshSession", v["email"], "start")
 		if v["mode"].Int() == 1 {
 			continue
+
+		}
+		getSessionUrl := config.CHATPROXY + "/getsession"
+		refreshCookie := gjson.New(v["officialSession"]).Get("refreshCookie").String()
+		if refreshCookie == "" {
+			continue
 		}
 
 		getSessionUrl := config.CHATPROXY(ctx) + "/getsession"

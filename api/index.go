@@ -18,45 +18,8 @@ func Index(r *ghttp.Request) {
 		return
 	}
 	model := r.Get("model").String()
-	props := `
-  {
-    "props": {
-        "pageProps": {
-            "user": {
-                "id": "user-xyhelper",
-                "name": "admin@closeai.com",
-                "email": "admin@closeai.com",
-                "image": "/avatars.png",
-                "picture": "/avatars.png",
-                "idp": "auth0",
-                "iat": 2699699364,
-                "mfa": false,
-                "groups": [],
-                "intercom_hash": "30fd0a0ada1c07ce526be7c3d54c22904b80fa7e2713d978630e979e4315cf67"
-            },
-            "serviceStatus": {},
-            "userCountry": "US",
-            "serviceAnnouncement": {
-                "paid": {},
-                "public": {}
-            },
-            "serverPrimedAllowBrowserStorageValue": true,
-            "canManageBrowserStorage": false,
-            "ageVerificationDeadline": null,
-            "showCookieConsentBanner": false
-        },
-        "__N_SSP": true
-    },
-    "page": "/[[...default]]",
-    "query": {},
-    "buildId": "wtXFegAXt6bfbujLr1e7S",
-    "assetPrefix": "",
-    "isFallback": false,
-    "gssp": true,
-    "scriptLoader": []
-}`
 
-	propsJson := gjson.New(props)
+	propsJson := gjson.New(Props)
 	if model != "" {
 		propsJson.Set("query.model", model)
 	}
@@ -80,42 +43,9 @@ func C(r *ghttp.Request) {
 	convId := r.GetRouter("convId").String()
 
 	g.Log().Debug(r.GetCtx(), "convId", convId)
-	props := `
-  {
-    "props": {
-      "pageProps": {
-        "user": {
-          "id": "user-xyhelper",
-          "name": "admin@closeai.com",
-          "email": "admin@closeai.com",
-          "image": "/avatars.png",
-          "picture": "/avatars.png",
-          "idp": "auth0",
-          "iat": 2699699364,
-          "mfa": false,
-          "groups": []
-        },
-        "serviceStatus": {},
-        "userCountry": "US",
-        "serviceAnnouncement": { "paid": {}, "public": {} },
-        "serverPrimedAllowBrowserStorageValue": true,
-        "canManageBrowserStorage": false,
-        "ageVerificationDeadline": null,
-        "showCookieConsentBanner": false
-      },
-      "__N_SSP": true
-    },
-    "page": "/[[...default]]",
-    "query": { "default": ["c", "98d86ec9-fa8b-42ba-98e8-ffd6c1d6cae4"] },
-    "buildId": "wtXFegAXt6bfbujLr1e7S",
-    "assetPrefix": "",
-    "isFallback": false,
-    "gssp": true,
-    "scriptLoader": []
-  }
-	`
 
-	propsJson := gjson.New(props)
+	propsJson := gjson.New(Props)
+	propsJson.Set("query.default.0", "c")
 	propsJson.Set("query.default.1", convId)
 	propsJson.Set("buildId", config.BuildId)
 	propsJson.Set("assetPrefix", config.AssetPrefix)

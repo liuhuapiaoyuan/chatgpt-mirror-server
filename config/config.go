@@ -33,13 +33,14 @@ func USERTOKENLOCK(ctx g.Ctx) bool {
 }
 
 var (
+	CHATPROXY    = "https://chatproxy-dev.closeai.biz"
 	DefaultModel = "text-davinci-002-render-sha"
 	FreeModels   = garray.NewStrArray()
 	Ja3Proxy     *url.URL // ja3代理
 	PlusModels   = garray.NewStrArray()
-	ArkoseUrl    = "https://tcr9i.closeai.biz/v2/"
-	BuildId      = "LxJWDayKNMzRjO_Ay4ljN"
-	CacheBuildId = "LxJWDayKNMzRjO_Ay4ljN"
+	ArkoseUrl    = "/v2/"
+	BuildId      = "MCkVH1jJi3yNLkMToVDdU"
+	CacheBuildId = "MCkVH1jJi3yNLkMToVDdU"
 	AssetPrefix  = "https://oaistatic-cdn.closeai.biz"
 	PK40         = "35536E1E-65B4-4D96-9D97-6ADB7EFF8147"
 	ProxyClient  *gclient.Client
@@ -87,10 +88,15 @@ func init() {
 	PlusModels.Append("gpt-4-plugins")
 	PlusModels.Append("gpt-4-mobile")
 	PlusModels.Append("gpt-4-gizmo")
-	arkoseUrl := g.Cfg().MustGetWithEnv(ctx, "ARKOSE_URL")
-	if !arkoseUrl.IsEmpty() {
-		ArkoseUrl = arkoseUrl.String()
+	// arkoseUrl := g.Cfg().MustGetWithEnv(ctx, "ARKOSE_URL")
+	// if !arkoseUrl.IsEmpty() {
+	// 	ArkoseUrl = arkoseUrl.String()
+	// }
+	chatproxy := g.Cfg().MustGetWithEnv(ctx, "CHATPROXY").String()
+	if chatproxy != "" {
+		CHATPROXY = chatproxy
 	}
+	g.Log().Info(ctx, "CHATPROXY:", CHATPROXY)
 	assetPrefix := g.Cfg().MustGetWithEnv(ctx, "ASSET_PREFIX").String()
 	if assetPrefix != "" {
 		AssetPrefix = assetPrefix
@@ -241,7 +247,7 @@ func GetEnvScript(ctx g.Ctx) string {
 
 // 检查是否有新版本
 func CheckNewVersion(ctx g.Ctx) (buildId string) {
-	resVar := g.Client().GetVar(ctx, CHATPROXY(ctx)+"/ping")
+	resVar := g.Client().GetVar(ctx, CHATPROXY+"/ping")
 	resJson := gjson.New(resVar)
 
 	buildId = resJson.Get("buildId").String()

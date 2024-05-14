@@ -71,7 +71,7 @@ func Api2backend(r *ghttp.Request) {
 	}
 	officialAccessToken := utility.AccessTokenFormSession(officialSession)
 
-	UpStream := config.CHATPROXY(ctx)
+	UpStream := config.CHATPROXY
 	u, _ := url.Parse(UpStream)
 	proxy := httputil.NewSingleHostReverseProxy(u)
 	proxy.ErrorHandler = func(writer http.ResponseWriter, request *http.Request, e error) {

@@ -36,6 +36,9 @@ func init() {
 	backendGroup.POST("/accounts/data_export", NotFound) // 禁用导出
 	backendGroup.POST("/payments/checkout", NotFound)    // 禁用支付
 	backendGroup.ALL("/accounts/*/invites", NotFound)    // 禁用邀请
+	backendGroup.ALL("/accounts/*/users/*", NotFound)    // 成员
+	backendGroup.ALL("/accounts/transfer", NotFound)     // 转移
+	backendGroup.ALL("/accounts/logout_all", NotFound)   // 登出
 	// backendGroup.GET("/accounts/check/*any", accounts.Check)
 	backendGroup.GET("/me", Me)
 	backendGroup.GET("/conversations", Conversations)

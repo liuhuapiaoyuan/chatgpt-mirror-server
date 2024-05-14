@@ -44,7 +44,7 @@ modules:
   base:
     jwt:
       sso: false
-      secret: "cool-admin-go"
+      secret: "cool-admin-go-dev"
       token:
         expire: 7200 # 2*3600
         refreshExpire: 1296000 # 24*3600*15
@@ -55,9 +55,7 @@ modules:
         enable: 1
 
 # 接入网关地址
-CHATPROXY:  "https://38.207.162.134:8443"
-#CHATPROXY: "https://chat.openai.com"
-#JA3_PROXY: "http://maidou:123456qq@38.207.162.134:9988"
+CHATPROXY: "https://chat.openai.com"
 #JA3_PROXY: "http://a:b@host.docker.internal:9988"
 #CHATPROXY: "http://host.docker.internal:7999"
 #CHATPROXY: "https://chatgpt.ggss.club/gateway"
