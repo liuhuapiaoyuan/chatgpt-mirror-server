@@ -195,7 +195,7 @@ func ProxyAll(r *ghttp.Request) {
 		if isCreateConversation {
 			CreateConversation(r, userId, chatgptId, userToken, r.UserAgent(), path)
 		} else if isLoadModels {
-			AttachGPT4Mobile(ctx, response)
+			//AttachGPT4Mobile(ctx, response)
 		} else if isShare {
 			originalBody, shouldReturn, returnValue := loadRespString(response)
 			if shouldReturn {

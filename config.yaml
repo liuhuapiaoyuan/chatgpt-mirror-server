@@ -55,15 +55,15 @@ modules:
         enable: 1
 
 # 接入网关地址
-CHATPROXY: "https://38.207.162.134:8443"
+CHATPROXY:  "https://38.207.162.134:8443"
 #CHATPROXY: "https://chat.openai.com"
-#JA3_PROXY: "http://a:b@host.docker.internal:9988"
+#JA3_PROXY: "http://maidou:123456qq@38.207.162.134:9988"
 #JA3_PROXY: "http://a:b@host.docker.internal:9988"
 #CHATPROXY: "http://host.docker.internal:7999"
 #CHATPROXY: "https://chatgpt.ggss.club/gateway"
 #ARKOSE_URL: "https://chatgpt.ggss.club/arkose/v2/"
 # 接入网关的authkey
-AUTHKEY: "xyhelper"
+AUTHKEY: "maidou"
 ONLYTOKEN: false
 CDNHOST: "https://file.chatgpt.ggss.club"
 ASSET_PREFIX: "https://cdn.chatgpt.ggss.club"
