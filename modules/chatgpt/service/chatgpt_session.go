@@ -46,7 +46,7 @@ func (s *ChatgptSessionService) ModifyAfter(ctx g.Ctx, method string, param map[
 	refreshCookie := officialSession.Get("refreshCookie").String()
 	// 如果没有officialSession，就去获取
 	g.Log().Debug(ctx, "ChatgptSessionService.ModifyAfter", "officialSession is empty")
-	getSessionUrl := config.CHATPROXY(ctx) + "/getsession"
+	getSessionUrl := config.CHATPROXY + "/getsession"
 	sessionVar := g.Client().SetHeader("authkey", config.AUTHKEY(ctx)).SetCookie("arkoseToken", gconv.String(param["arkoseToken"])).PostVar(ctx, getSessionUrl, g.Map{
 		"username":      param["email"],
 		"password":      param["password"],
@@ -123,7 +123,7 @@ func ClearChatHistory(ctx g.Ctx, officalSession string) {
 		return
 	}
 	g.Log().Debug(ctx, "ChatgptSessionService.ClearChatHistory", "officalSession", officalSession)
-	clearUrl := config.CHATPROXY(ctx) + "/backend-api/conversations"
+	clearUrl := config.CHATPROXY + "/backend-api/conversations"
 	accessToken := gjson.New(officalSession).Get("accessToken").String()
 	// 请求内容 {"is_visible":false}
 	client := g.Client()

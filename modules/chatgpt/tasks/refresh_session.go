@@ -31,7 +31,7 @@ func RefreshSession(ctx g.Ctx) {
 	}
 	for _, v := range result {
 		g.Log().Info(ctx, "RefreshSession", v["email"], "start")
-		getSessionUrl := config.CHATPROXY(ctx) + "/getsession"
+		getSessionUrl := config.CHATPROXY + "/getsession"
 		refreshCookie := gjson.New(v["officialSession"]).Get("refreshCookie").String()
 		if refreshCookie == "" {
 			continue

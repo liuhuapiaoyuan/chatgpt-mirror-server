@@ -45,7 +45,7 @@ modules:
   base:
     jwt:
       sso: false
-      secret: "cool-admin-go"
+      secret: "cool-admin-go-dev"
       token:
         expire: 7200 # 2*3600
         refreshExpire: 1296000 # 24*3600*15
@@ -56,8 +56,7 @@ modules:
         enable: 1
 
 # 接入网关地址
-CHATPROXY: "https://demo.xyhelper.cn"
-# CHATPROXY: "https://chatproxy-dev.closeai.biz"
+CHATPROXY: "https://chatproxy-dev.closeai.biz"
 # 接入网关的authkey
 AUTHKEY: "xyhelper"
 ONLYTOKEN: true

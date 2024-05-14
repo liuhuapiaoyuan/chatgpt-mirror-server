@@ -26,7 +26,7 @@ func Me(r *ghttp.Request) {
 	}
 	officialSession := gjson.New(record["officialSession"].String())
 	AccessToken := officialSession.Get("accessToken").String()
-	UpStream := config.CHATPROXY(ctx)
+	UpStream := config.CHATPROXY
 	// 请求后端接口
 	res, err := g.Client().SetHeaderMap(map[string]string{
 		"Authorization": "Bearer " + AccessToken,

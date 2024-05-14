@@ -29,7 +29,7 @@ func Session(r *ghttp.Request) {
 		return
 	}
 	officialSession := gjson.New(record["officialSession"].String())
-	getSessionUrl := config.CHATPROXY(ctx) + "/getsession"
+	getSessionUrl := config.CHATPROXY + "/getsession"
 	refreshCookie := officialSession.Get("refreshCookie").String()
 	sessionVar := g.Client().SetHeader("authkey", config.AUTHKEY(ctx)).PostVar(ctx, getSessionUrl, g.Map{
 		"username":      record["email"].String(),

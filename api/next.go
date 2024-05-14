@@ -18,7 +18,7 @@ func ProxyNext(r *ghttp.Request) {
 	ctx := r.Context()
 	officalSession := gjson.New(r.Session.MustGet("offical-session"))
 	refreshCookie := officalSession.Get("refreshCookie").String()
-	u, _ := url.Parse(config.CHATPROXY(ctx))
+	u, _ := url.Parse(config.CHATPROXY)
 	proxy := httputil.NewSingleHostReverseProxy(u)
 	proxy.ErrorHandler = func(writer http.ResponseWriter, request *http.Request, e error) {
 		writer.WriteHeader(http.StatusBadGateway)

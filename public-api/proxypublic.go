@@ -11,11 +11,10 @@ import (
 
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
-	"github.com/gogf/gf/v2/os/gctx"
 )
 
 var (
-	u, _  = url.Parse(config.CHATPROXY(gctx.New()))
+	u, _  = url.Parse(config.CHATPROXY)
 	proxy = httputil.NewSingleHostReverseProxy(u)
 )
 
