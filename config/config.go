@@ -16,9 +16,9 @@ import (
 	"github.com/gogf/gf/v2/util/gconv"
 )
 
-func CHATPROXY(ctx g.Ctx) string {
-	return g.Cfg().MustGetWithEnv(ctx, "CHATPROXY").String()
-}
+//	func CHATPROXY(ctx g.Ctx) string {
+//		return g.Cfg().MustGetWithEnv(ctx, "CHATPROXY").String()
+//	}
 func WS_SERVICE(ctx g.Ctx) string {
 	return g.Cfg().MustGetWithEnv(ctx, "WS_SERVICE").String()
 }

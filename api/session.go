@@ -62,7 +62,7 @@ func Session(r *ghttp.Request) {
 			refreshFlag = expires.Before(time.Now())
 		}
 
-		getSessionUrl := config.CHATPROXY(ctx) + "/getsession"
+		getSessionUrl := config.CHATPROXY + "/getsession"
 		// 判断是否过期
 		if refreshFlag {
 			g.Log().Info(ctx, "session 过期，重新获取")

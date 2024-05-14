@@ -39,7 +39,7 @@ func Check(r *ghttp.Request) {
 	// client.SetHeader("Authorization", authHeader)
 	// client.SetHeader("authkey", config.AUTHKEY(ctx))
 
-	// res := client.GetVar(ctx, config.CHATPROXY(ctx)+"/backend-api/accounts/check/v4-2023-04-27")
+	// res := client.GetVar(ctx, config.CHATPROXY+"/backend-api/accounts/check/v4-2023-04-27")
 	// resJson := gjson.New(res)
 	jsonStr := `{
 		"accounts": {

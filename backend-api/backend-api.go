@@ -21,10 +21,12 @@ import (
 	"github.com/gogf/gf/v2/encoding/gjson"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
+	"github.com/gogf/gf/v2/os/gcache"
 )
 
 var (
 	ChatgptSessionService = service.NewChatgptSessionService()
+	AccessTokenCache      = gcache.New()
 )
 
 func init() {
@@ -62,7 +64,7 @@ func ProxyRequestGet(path string, r *ghttp.Request) (resStr string, err error) {
 	}
 	_, _, accessToken, err := ChatgptSessionService.GetAccessToken(ctx, userToken)
 
-	UpStream := config.CHATPROXY(ctx)
+	UpStream := config.CHATPROXY
 	if err != nil {
 		// 处理错误
 		panic(err)
@@ -142,7 +144,7 @@ func ProxyAll(r *ghttp.Request) {
 	WsUpStream := config.WS_SERVICE(ctx)
 	// g.Log().Info(ctx, "ProxyBackendApi:", path)
 	proxy := &httputil.ReverseProxy{}
-	UpStream := config.CHATPROXY(ctx)
+	UpStream := config.CHATPROXY
 
 	proxy.Transport = &http.Transport{
 		TLSClientConfig: &tls.Config{

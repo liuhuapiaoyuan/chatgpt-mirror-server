@@ -18,10 +18,10 @@ func Me(r *ghttp.Request) {
 		g.Log().Error(ctx, err)
 		r.Response.WriteStatus(http.StatusUnauthorized)
 		return
-	} 
+	}
 	resStr, err := ProxyRequestGet("/backend-api/me", r)
 
-	// UpStream := config.CHATPROXY(ctx)
+	// UpStream := config.CHATPROXY
 	// // 请求后端接口
 	// res, err := g.Client().SetHeaderMap(map[string]string{
 	// 	"Authorization": "Bearer " + AccessToken,

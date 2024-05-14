@@ -14,7 +14,7 @@ import (
 
 func Share(r *ghttp.Request) {
 	ctx := r.GetCtx()
-	UpStream := config.CHATPROXY(ctx)
+	UpStream := config.CHATPROXY
 	// 分享按钮
 	buttonContent := "Get started with <span class=\"font-bold\">ChatGPT</span>"
 

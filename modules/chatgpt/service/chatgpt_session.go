@@ -57,7 +57,7 @@ func (s *ChatgptSessionService) ModifyAfter(ctx g.Ctx, method string, param map[
 	officialSession := param["officialSession"]
 	if officialSession == "" {
 		g.Log().Debug(ctx, "ChatgptSessionService.ModifyAfter", "officialSession is empty")
-		getSessionUrl := config.CHATPROXY(ctx) + "/getsession"
+		getSessionUrl := config.CHATPROXY + "/getsession"
 		sessionVar := g.Client().SetHeader("authkey", config.AUTHKEY(ctx)).SetCookie("arkoseToken", gconv.String(param["arkoseToken"])).PostVar(ctx, getSessionUrl, g.Map{
 			"username": param["email"],
 			"password": param["password"],
@@ -91,7 +91,7 @@ func (s *ChatgptSessionService) ModifyAfter(ctx g.Ctx, method string, param map[
 
 // 写一个函数 刷新数据
 func (s *ChatgptSessionService) RefreshSession(ctx g.Ctx, chatgpt_session gdb.Record) (err error) {
-	getSessionUrl := config.CHATPROXY(ctx) + "/getsession"
+	getSessionUrl := config.CHATPROXY + "/getsession"
 	sessionVar := g.Client().SetHeader("authkey", config.AUTHKEY(ctx)).PostVar(ctx, getSessionUrl, g.Map{
 		"username": chatgpt_session["email"],
 		"password": chatgpt_session["password"],

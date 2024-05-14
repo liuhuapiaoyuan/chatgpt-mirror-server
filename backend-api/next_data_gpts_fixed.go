@@ -17,7 +17,7 @@ func NextDataGptsFixed(r *ghttp.Request) {
 	// 如果请求包含gizmoId
 	gizmoId := r.Request.URL.Query().Get("gizmoId")
 	if gizmoId != "" {
-		UpStream := config.CHATPROXY(ctx)
+		UpStream := config.CHATPROXY
 		u, _ := url.Parse(UpStream)
 		proxy := httputil.NewSingleHostReverseProxy(u)
 		proxy.Transport = &http.Transport{
