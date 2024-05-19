@@ -1,3 +1,4 @@
+
 package api
 
 import (
@@ -46,6 +47,7 @@ func C(r *ghttp.Request) {
 
 	propsJson := gjson.New(Props)
 	propsJson.Set("query.default.0", "c")
+
 	propsJson.Set("query.default.1", convId)
 	propsJson.Set("buildId", config.BuildId)
 	propsJson.Set("assetPrefix", config.AssetPrefix)
@@ -58,28 +60,6 @@ func C(r *ghttp.Request) {
 	})
 }
 
-// Gpts
-func Gpts(r *ghttp.Request) {
-
-	if r.Session.MustGet("offical-session").IsEmpty() {
-		r.Session.RemoveAll()
-		r.Response.RedirectTo("/login")
-		return
-	}
-	
-	propsJson := gjson.New(Props)
-	propsJson.Set("buildId", config.BuildId)
-  	propsJson.Set("assetPrefix", config.AssetPrefix)
-	propsJson.Set("page", "/gpts")
-
-	r.Response.WriteTpl(config.CacheBuildId+"/gpts.html", g.Map{
-		"arkoseUrl":   config.ArkoseUrl,
-		"props":       propsJson,
-		"assetPrefix": config.AssetPrefix,
-		"envScript":   config.GetEnvScript(r.GetCtx()),
-	})
-}
-
 // Discovery 发现
 func Discovery(r *ghttp.Request) {
 
@@ -88,13 +68,35 @@ func Discovery(r *ghttp.Request) {
 		r.Response.RedirectTo("/login")
 		return
 	}
-	
+
 	propsJson := gjson.New(Props)
 	propsJson.Set("buildId", config.BuildId)
- 	propsJson.Set("assetPrefix", config.AssetPrefix)
+	propsJson.Set("assetPrefix", config.AssetPrefix)
 	propsJson.Set("page", "/gpts/discovery")
 
 	r.Response.WriteTpl(config.CacheBuildId+"/discovery.html", g.Map{
+		"arkoseUrl":   config.ArkoseUrl,
+		"props":       propsJson,
+		"assetPrefix": config.AssetPrefix,
+		"envScript":   config.GetEnvScript(r.GetCtx()),
+	})
+}
+
+// Gpts
+func Gpts(r *ghttp.Request) {
+
+	if r.Session.MustGet("offical-session").IsEmpty() {
+		r.Session.RemoveAll()
+		r.Response.RedirectTo("/login")
+		return
+	}
+
+	propsJson := gjson.New(Props)
+	propsJson.Set("buildId", config.BuildId)
+	propsJson.Set("assetPrefix", config.AssetPrefix)
+	propsJson.Set("page", "/gpts")
+
+	r.Response.WriteTpl(config.CacheBuildId+"/gpts.html", g.Map{
 		"arkoseUrl":   config.ArkoseUrl,
 		"props":       propsJson,
 		"assetPrefix": config.AssetPrefix,
@@ -114,7 +116,6 @@ func Editor(r *ghttp.Request) {
 	propsJson := gjson.New(Props)
 	propsJson.Set("buildId", config.BuildId)
 	propsJson.Set("assetPrefix", config.AssetPrefix)
-  	propsJson.Set("assetPrefix", config.AssetPrefix)
 	propsJson.Set("page", "/gpts/editor")
 
 	// if slug != "" {
@@ -140,12 +141,13 @@ func Slug(r *ghttp.Request) {
 		return
 	}
 	slug := r.GetRouter("slug").String()
+
 	propsJson := gjson.New(Props)
 
 	propsJson.Set("query.slug", slug)
 	propsJson.Set("buildId", config.BuildId)
 	propsJson.Set("assetPrefix", config.AssetPrefix)
-  	propsJson.Set("page", "/gpts/editor/[slug]")
+	propsJson.Set("page", "/gpts/editor/[slug]")
 
 	r.Response.WriteTpl(config.CacheBuildId+"/slug.html", g.Map{
 		"arkoseUrl":   config.ArkoseUrl,
@@ -164,12 +166,12 @@ func G(r *ghttp.Request) {
 		return
 	}
 	gizmoId := r.GetRouter("gizmoId").String()
-	
-	propsJson := gjson.New(Props)
+
+	propsJson := gjson.New(PropsG)
 	propsJson.Set("query.gizmoId", gizmoId)
 	propsJson.Set("buildId", config.BuildId)
 	propsJson.Set("assetPrefix", config.AssetPrefix)
-  	propsJson.Set("page", "/g/[gizmoId]")
+	propsJson.Set("page", "/g/[gizmoId]")
 
 	r.Response.WriteTpl(config.CacheBuildId+"/g.html", g.Map{
 		"arkoseUrl":   config.ArkoseUrl,
@@ -179,6 +181,7 @@ func G(r *ghttp.Request) {
 	})
 }
 
+// GC 游戏会话
 func GC(r *ghttp.Request) {
 
 	if r.Session.MustGet("offical-session").IsEmpty() {
@@ -189,12 +192,12 @@ func GC(r *ghttp.Request) {
 	gizmoId := r.GetRouter("gizmoId").String()
 	convId := r.GetRouter("convId").String()
 	g.Log().Debug(r.GetCtx(), "gizmoId", gizmoId)
-	
+
 	propsJson := gjson.New(Props)
 	propsJson.Set("query.gizmoId", gizmoId)
 	propsJson.Set("query.convId", convId)
 	propsJson.Set("buildId", config.BuildId)
-  	propsJson.Set("page", "/g/[gizmoId]/c/[convId]")
+	propsJson.Set("page", "/g/[gizmoId]/c/[convId]")
 
 	r.Response.WriteTpl(config.CacheBuildId+"/gc.html", g.Map{
 		"arkoseUrl":   config.ArkoseUrl,
@@ -211,6 +214,7 @@ func Mine(r *ghttp.Request) {
 		r.Response.RedirectTo("/login")
 		return
 	}
+
 	propsJson := gjson.New(Props)
 	propsJson.Set("buildId", config.BuildId)
 	propsJson.Set("assetPrefix", config.AssetPrefix)
