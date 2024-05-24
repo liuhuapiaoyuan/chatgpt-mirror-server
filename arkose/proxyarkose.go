@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	UpStream = config.CHATPROXY
+	UpStream = config.ARKOSE_PROXY_URL
 	proxy    *httputil.ReverseProxy
 	Remote   *url.URL
 )
@@ -19,6 +19,7 @@ func init() {
 	remote, _ := url.Parse(UpStream)
 	Remote = remote
 	proxy = httputil.NewSingleHostReverseProxy(remote)
+
 }
 
 func ProxyArkose(r *ghttp.Request) {

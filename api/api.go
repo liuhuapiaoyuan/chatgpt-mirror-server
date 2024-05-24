@@ -40,6 +40,7 @@ func init() {
 	group.GET("/auth/logout", Logout)
 	group.GET("/api/auth/session", Session)
 	group.GET("/public-api/conversation_limit", backendapi.ProxyAll)
+	group.GET("/public-api/gizmos/discovery/recent", backendapi.ProxyAll)
 	group.POST("/api/accounts/data_export", NotFound) // 禁用导出
 	group.POST("/api/payments/checkout", NotFound)    // 禁用支付
 

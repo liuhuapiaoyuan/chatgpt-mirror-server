@@ -59,7 +59,7 @@ CHATPROXY: "https://chat.openai.com"
 JA3_PROXY: "http://a:b@host.docker.internal:9988"
 #CHATPROXY: "http://host.docker.internal:7999"
 #CHATPROXY: "https://chatgpt.ggss.club/gateway"
-#ARKOSE_URL: "https://chatgpt.ggss.club/arkose/v2/"
+ARKOSE_PROXY_URL: "https://chatgpt1.ggss.club"
 # 接入网关的authkey
 AUTHKEY: "maidou"
 ONLYTOKEN: false

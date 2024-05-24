@@ -33,19 +33,20 @@ func USERTOKENLOCK(ctx g.Ctx) bool {
 }
 
 var (
-	CHATPROXY    = "https://chatproxy-dev.closeai.biz"
-	DefaultModel = "text-davinci-002-render-sha"
-	FreeModels   = garray.NewStrArray()
-	Ja3Proxy     *url.URL // ja3代理
-	PlusModels   = garray.NewStrArray()
-	ArkoseUrl    = "/v2/"
-	BuildId      = "MCkVH1jJi3yNLkMToVDdU"
-	CacheBuildId = "MCkVH1jJi3yNLkMToVDdU"
-	AssetPrefix  = "https://oaistatic-cdn.closeai.biz"
-	PK40         = "35536E1E-65B4-4D96-9D97-6ADB7EFF8147"
-	ProxyClient  *gclient.Client
-	PK35         = "3D86FBBA-9D22-402A-B512-3420086BA6CC"
-	envScriptTpl = `
+	CHATPROXY        = "https://chatproxy-dev.closeai.biz"
+	DefaultModel     = "text-davinci-002-render-sha"
+	FreeModels       = garray.NewStrArray()
+	Ja3Proxy         *url.URL // ja3代理
+	PlusModels       = garray.NewStrArray()
+	ArkoseUrl        = "/v2/"
+	ARKOSE_PROXY_URL = "https://chatproxy-dev.closeai.biz"
+	BuildId          = "MCkVH1jJi3yNLkMToVDdU"
+	CacheBuildId     = "MCkVH1jJi3yNLkMToVDdU"
+	AssetPrefix      = "https://oaistatic-cdn.closeai.biz"
+	PK40             = "35536E1E-65B4-4D96-9D97-6ADB7EFF8147"
+	ProxyClient      *gclient.Client
+	PK35             = "3D86FBBA-9D22-402A-B512-3420086BA6CC"
+	envScriptTpl     = `
 	<script>
 	window.__arkoseUrl="{{.ArkoseUrl}}";
 	window.__assetPrefix="{{.AssetPrefix}}";
@@ -88,10 +89,10 @@ func init() {
 	PlusModels.Append("gpt-4-plugins")
 	PlusModels.Append("gpt-4-mobile")
 	PlusModels.Append("gpt-4-gizmo")
-	// arkoseUrl := g.Cfg().MustGetWithEnv(ctx, "ARKOSE_URL")
-	// if !arkoseUrl.IsEmpty() {
-	// 	ArkoseUrl = arkoseUrl.String()
-	// }
+	arkoseProxyUrl := g.Cfg().MustGetWithEnv(ctx, "ARKOSE_PROXY_URL")
+	if !arkoseProxyUrl.IsEmpty() {
+		ARKOSE_PROXY_URL = arkoseProxyUrl.String()
+	}
 	chatproxy := g.Cfg().MustGetWithEnv(ctx, "CHATPROXY").String()
 	if chatproxy != "" {
 		CHATPROXY = chatproxy
