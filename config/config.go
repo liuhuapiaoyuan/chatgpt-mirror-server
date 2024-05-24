@@ -89,13 +89,14 @@ func init() {
 	PlusModels.Append("gpt-4-plugins")
 	PlusModels.Append("gpt-4-mobile")
 	PlusModels.Append("gpt-4-gizmo")
-	arkoseProxyUrl := g.Cfg().MustGetWithEnv(ctx, "ARKOSE_PROXY_URL")
-	if !arkoseProxyUrl.IsEmpty() {
-		ARKOSE_PROXY_URL = arkoseProxyUrl.String()
-	}
 	chatproxy := g.Cfg().MustGetWithEnv(ctx, "CHATPROXY").String()
 	if chatproxy != "" {
 		CHATPROXY = chatproxy
+		ARKOSE_PROXY_URL = chatproxy
+	}
+	arkoseProxyUrl := g.Cfg().MustGetWithEnv(ctx, "ARKOSE_PROXY_URL")
+	if !arkoseProxyUrl.IsEmpty() {
+		ARKOSE_PROXY_URL = arkoseProxyUrl.String()
 	}
 	g.Log().Info(ctx, "CHATPROXY:", CHATPROXY)
 	assetPrefix := g.Cfg().MustGetWithEnv(ctx, "ASSET_PREFIX").String()
