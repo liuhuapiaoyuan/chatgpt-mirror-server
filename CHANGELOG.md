@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.3.0](https://github.com/liuhuapiaoyuan/chatgpt-mirror-server/compare/v1.2.2...v1.3.0) (2024-05-24)
+
+
+### Features
+
+* 增加新UI适配，增加ARKOSE_PROXY_URL的适配 ([541ed35](https://github.com/liuhuapiaoyuan/chatgpt-mirror-server/commit/541ed355e019358a2391983387bfd5a217e2ea9f))
+* 普号强制打开gpt-4o ([2a38be3](https://github.com/liuhuapiaoyuan/chatgpt-mirror-server/commit/2a38be371f4055dda639d7853e1f253d7fe32d86))
+
+
+### Bug Fixes
+
+* 修复一些语法错误 ([bc253e9](https://github.com/liuhuapiaoyuan/chatgpt-mirror-server/commit/bc253e9a81b98bee628005ec43a35905f865d71c))
+* 将动态代码生成的菜单纳入版本库 ([62f145e](https://github.com/liuhuapiaoyuan/chatgpt-mirror-server/commit/62f145e772072cd8c2f8dd4c91c4dcf1ca77ace5))
+* 移除mobile ([c7ea156](https://github.com/liuhuapiaoyuan/chatgpt-mirror-server/commit/c7ea1562fc7a20d814e1e853bc1594a152f3bfb2))
+* 调整gitignore 排除 cool/temp ([74b1ac9](https://github.com/liuhuapiaoyuan/chatgpt-mirror-server/commit/74b1ac99836b598879b22c1c5b8ea71d3ea62cbb))
+* 调整部分细节 ([76225a9](https://github.com/liuhuapiaoyuan/chatgpt-mirror-server/commit/76225a9357c0cd4f40101c7767d28e86a7303614))
+* 默认ARKOSE的配置 ([a72205f](https://github.com/liuhuapiaoyuan/chatgpt-mirror-server/commit/a72205ffa74be38d8c2b1cc758f076cc7382fe13))
+
 ## [1.2.2](https://github.com/liuhuapiaoyuan/chatgpt-mirror-server/compare/v1.2.1...v1.2.2) (2024-04-16)
 
 
